@@ -1,0 +1,471 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* 上揃えに変更 */
+    min-height: 100vh;
+    padding: 20px 0; /* 上下に余白を追加 */
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 40px); /* 上下のpadding分を引く */
+}
+
+h1 {
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px;
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.settings-wrapper {
+    padding: 0 15px;
+    background: #f1f3f5;
+    flex-shrink: 0;
+}
+
+#settings-toggle-btn {
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #495057;
+    cursor: pointer;
+    text-align: left;
+}
+
+.settings {
+    padding: 10px 0 15px;
+    background: #f1f3f5;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.settings label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.settings select,
+.settings input {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    font-size: 1rem;
+}
+
+.settings input[type="number"] {
+    width: 70px;
+}
+
+.game-area {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* .container内で残りの高さを埋める */
+}
+
+.display-area {
+    margin-bottom: 5px;
+    flex-shrink: 0;
+}
+
+.display-tabs {
+    display: flex;
+    margin-bottom: -1px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    background: #f8f9fa;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    color: #495057;
+}
+
+.tab-btn.active {
+    background: white;
+    border-bottom: 1px solid white;
+    color: #000;
+}
+
+.tab-btn:disabled {
+    background: #e9ecef;
+    color: #adb5bd;
+    cursor: not-allowed;
+}
+
+.tab-content {
+    display: none;
+    border: 1px solid #dee2e6;
+    border-radius: 0 0 8px 8px;
+    padding: 4px;
+    max-height: 140px;
+    overflow-y: auto;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tiles-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.tile {
+    width: clamp(28px, 7vw, 45px);
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+    vertical-align: middle;
+}
+
+.tile:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: space-between; /* 要素を上下に配置 */
+}
+
+.question-area {
+    width: 100%;
+}
+
+.question-area h3 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.result-message {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    min-height: 42px; /* 高さを確保してレイアウトがずれるのを防ぐ */
+    display: flex; /* 中央揃えのため */
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.result-message.visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+.result-message.correct {
+    background: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+
+.result-message.incorrect {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c2c7;
+}
+
+.result-message.answer {
+    background: #fff3cd;
+    color: #664d03;
+    border: 1px solid #ffecb5;
+}
+
+.calculator {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 10px;
+    margin: 0 auto;
+    max-width: 280px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.display {
+    background: #333;
+    color: white;
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: right;
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.calc-btn {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 40px;
+}
+
+.calc-btn:hover {
+    background: #f1f3f5;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+}
+
+.action-btn {
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex: 1;
+    max-width: 140px;
+}
+
+.action-btn.submit {
+    background: #198754;
+    color: white;
+}
+
+.action-btn.giveup {
+    background: #ffc107;
+    color: #333;
+}
+
+.action-btn.next {
+    background: #0d6efd;
+    color: white;
+}
+
+.ukeire-tile-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 4px;
+}
+
+.ukeire-count {
+    margin-top: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #667eea;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+.loader-overlay p {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.loader-overlay .action-btn {
+    margin-top: 20px;
+    flex: 0 0 auto; /* Do not grow or shrink */
+    width: 120px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 広告コンテナの基本スタイル */
+.ad-container-side, .ad-container-bottom {
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 14px;
+    overflow: hidden;
+}
+
+/* PC用サイド広告 */
+.ad-container-side {
+    position: fixed;
+    top: 0;
+    width: 160px; /* 広告の幅に合わせて調整 */
+    height: 100%;
+    z-index: 10;
+    display: none; /* デフォルトでは非表示 */
+}
+
+.ad-left {
+    left: 0;
+}
+
+.ad-right {
+    right: 0;
+}
+
+/* モバイル用下部広告 */
+.ad-container-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px; /* 広告の高さに合わせて調整 */
+    z-index: 10;
+    border-top: 1px solid #ddd;
+}
+
+/* bodyのpaddingをリセットし、containerで管理 */
+body {
+    padding-bottom: 0;
+}
+
+.container {
+    padding-bottom: 50px; /* 下部広告の高さ分 */
+}
+
+
+@media (max-width: 600px) {
+    body {
+        padding: 0; /* モバイルではbodyのpaddingをなくす */
+        align-items: flex-start;
+    }
+    .container {
+        border-radius: 0;
+        width: 100%;
+        min-height: 100vh;
+        padding-bottom: 60px; /* 広告領域 + 少し余白 */
+        box-sizing: border-box;
+    }
+    h1 {
+        font-size: 1.2rem;
+        padding: 12px;
+    }
+    .game-area {
+        padding: 10px;
+        justify-content: flex-start; /* Align items to the top */
+    }
+    .main-content {
+        justify-content: flex-start;
+        gap: 10px;
+        flex-grow: 0; /* Don't grow to fill space */
+    }
+    .calculator {
+        padding: 10px;
+    }
+    .tile {
+        width: clamp(30px, 8vw, 48px); /* Make tiles slightly larger on mobile */
+    }
+    .ukeire-tile-wrapper .tile {
+        width: clamp(36px, 9vw, 52px); /* Make ukeire tiles even larger */
+    }
+    .ad-container-side {
+        display: none !important; /* モバイルではサイド広告を強制的に非表示 */
+    }
+}
+
+/* PC表示用のメディアクエリ */
+@media (min-width: 1300px) {
+    .ad-container-side {
+        display: flex; /* PCではサイド広告を表示 */
+    }
+    .ad-container-bottom {
+        display: none; /* PCでは下部広告を非表示 */
+    }
+    .container {
+        margin: 0 170px; /* サイド広告の幅分マージンをとる */
+        padding-bottom: 0; /* PCでは下部パディングをリセット */
+    }
+}
