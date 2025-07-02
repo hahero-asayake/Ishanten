@@ -1,38 +1,42 @@
 // 麻雀牌の定義
 const TILES = {
-  man: ['1m','2m','3m','4m','5m','6m','7m','8m','9m'],
-  pin: ['1p','2p','3p','4p','5p','6p','7p','8p','9p'],
-  sou: ['1s','2s','3s','4s','5s','6s','7s','8s','9s'],
-  honor: ['東','南','西','北','白','發','中']
-};
-
-const TILE_NAMES = {
-    '1m': '一萬', '2m': '二萬', '3m': '三萬', '4m': '四萬', '5m': '五萬', 
-    '6m': '六萬', '7m': '七萬', '8m': '八萬', '9m': '九萬',
-    '1p': '一筒', '2p': '二筒', '3p': '三筒', '4p': '四筒', '5p': '五筒',
-    '6p': '六筒', '7p': '七筒', '8p': '八筒', '9p': '九筒',
-    '1s': '一索', '2s': '二索', '3s': '三索', '4s': '四索', '5s': '五索',
-    '6s': '六索', '7s': '七索', '8s': '八索', '9s': '九索',
-    '東': '東', '南': '南', '西': '西', '北': '北', '白': '白', '發': '發', '中': '中'
+  man: ['1m','2m','3m','4m','5m','6m','7m','8m','9m'], // 萬子
+  pin: ['1p','2p','3p','4p','5p','6p','7p','8p','9p'], // 筒子
+  sou: ['1s','2s','3s','4s','5s','6s','7s','8s','9s'], // 索子
+  honor: ['東','南','西','北','白','發','中'] // 字牌
 };
 
 const ALL_TILES = [...TILES.man, ...TILES.pin, ...TILES.sou, ...TILES.honor];
 
+// 牌の表示名
+const TILE_NAMES = {
+  '1m':'一萬','2m':'二萬','3m':'三萬','4m':'四萬','5m':'五萬',
+  '6m':'六萬','7m':'七萬','8m':'八萬','9m':'九萬',
+  '1p':'一筒','2p':'二筒','3p':'三筒','4p':'四筒','5p':'五筒',
+  '6p':'六筒','7p':'七筒','8p':'八筒','9p':'九筒',
+  '1s':'一索','2s':'二索','3s':'三索','4s':'四索','5s':'五索',
+  '6s':'六索','7s':'七索','8s':'八索','9s':'九索',
+  '東':'東','南':'南','西':'西','北':'北','白':'白','發':'發','中':'中'
+};
+
+// 牌文字列 → インデックス
 function tileToIndex(tile) {
-  if (tile.endsWith('m')) return parseInt(tile)-1;
-  if (tile.endsWith('p')) return parseInt(tile)-1 + 9;
-  if (tile.endsWith('s')) return parseInt(tile)-1 + 18;
+  if (tile.endsWith('m')) return parseInt(tile) - 1;
+  if (tile.endsWith('p')) return parseInt(tile) - 1 + 9;
+  if (tile.endsWith('s')) return parseInt(tile) - 1 + 18;
   const honors = ['東','南','西','北','白','發','中'];
   return honors.indexOf(tile) + 27;
 }
 
-function indexToTile(i) {
-  if (i<9)   return (i+1)+'m';
-  if (i<18)  return (i-9+1)+'p';
-  if (i<27)  return (i-18+1)+'s';
-  return ['東','南','西','北','白','發','中'][i-27];
+// インデックス → 牌文字列
+function indexToTile(index) {
+  if (index < 9) return `${index+1}m`;
+  if (index < 18) return `${index-9+1}p`;
+  if (index < 27) return `${index-18+1}s`;
+  return ['東','南','西','北','白','發','中'][index-27];
 }
 
+// 手牌配列 ↔ カウント配列
 function handToArray(hand) {
   const arr = Array(34).fill(0);
   hand.forEach(t => arr[tileToIndex(t)]++);
@@ -40,20 +44,21 @@ function handToArray(hand) {
 }
 function arrayToHand(arr) {
   const hand = [];
-  arr.forEach((c,i) => {
-    for(let k=0;k<c;k++) hand.push(indexToTile(i));
-  });
+  arr.forEach((cnt,i) => { for(let j=0;j<cnt;j++) hand.push(indexToTile(i)); });
   return hand;
 }
 
+// ランダム整数
 const getRandomInt = max => Math.floor(Math.random()*max);
+
+// 牌プールからランダムに牌を選ぶ（4枚超え禁止）
 function getRandomTile(hand) {
-  let t;
-  do { t = getRandomInt(34); }
-  while(hand[t] >= 4);
-  return t;
+  let idx;
+  do { idx = getRandomInt(34); } while (hand[idx] >= 4);
+  return idx;
 }
 
+// 刻子生成
 function generateKoutsu(hand) {
   const t = getRandomTile(hand);
   if (hand[t] <= 1) {
@@ -63,17 +68,19 @@ function generateKoutsu(hand) {
   return false;
 }
 
+// 順子生成
 function generateShuntsu(hand) {
   const suit = getRandomInt(3);
-  const start = suit*9 + getRandomInt(7);
-  if (start >= 27) return false;
-  if (hand[start]<4 && hand[start+1]<4 && hand[start+2]<4) {
-    hand[start]++; hand[start+1]++; hand[start+2]++;
+  const start = getRandomInt(7);
+  const idx = suit*9 + start;
+  if (idx+2 < 27 && idx%9 <= 6 && hand[idx]<4 && hand[idx+1]<4 && hand[idx+2]<4) {
+    hand[idx]++; hand[idx+1]++; hand[idx+2]++;
     return true;
   }
   return false;
 }
 
+// 対子生成
 function generateToitsu(hand) {
   const t = getRandomTile(hand);
   if (hand[t] <= 2) {
@@ -83,139 +90,187 @@ function generateToitsu(hand) {
   return false;
 }
 
+// ターツ生成
 function generateTatsu(hand) {
-  const type = getRandomInt(3), suit = getRandomInt(3);
-  let start;
+  const suit = getRandomInt(3);
+  const type = getRandomInt(3);
+  let idx;
   switch(type) {
-    case 0:
-      start = suit*9 + 1 + getRandomInt(6);
-      if (start>=27) return false;
-      if (hand[start]<4 && hand[start+1]<4) {
-        hand[start]++; hand[start+1]++; return true;
+    case 0: // 両面
+      idx = suit*9 + 1 + getRandomInt(7);
+      if (idx<27 && idx%9<=6 && hand[idx]<4 && hand[idx+1]<4) {
+        hand[idx]++; hand[idx+1]++;
+        return true;
       }
       break;
-    case 1:
-      start = suit*9 + getRandomInt(7);
-      if (start>=27) return false;
-      if (hand[start]<4 && hand[start+2]<4) {
-        hand[start]++; hand[start+2]++; return true;
+    case 1: // 嵌張
+      idx = suit*9 + getRandomInt(7);
+      if (idx<27 && hand[idx]<4 && hand[idx+2]<4) {
+        hand[idx]++; hand[idx+2]++;
+        return true;
       }
       break;
-    case 2:
+    case 2: // 辺張
       const side = getRandomInt(2);
-      start = suit*9 + (side===0?0:7);
-      if (start>=27) return false;
-      if (hand[start]<4 && hand[start+1]<4) {
-        hand[start]++; hand[start+1]++; return true;
+      idx = suit*9 + (side===0?0:7);
+      if (idx<27 && hand[idx]<4 && hand[idx+1]<4) {
+        hand[idx]++; hand[idx+1]++;
+        return true;
       }
       break;
   }
   return false;
 }
 
+// 指定シャンテン数の手牌を生成
 function generateHand(targetShanten) {
   while(true) {
     const hand = Array(34).fill(0);
-    const mentsu = getRandomInt(5);
-    const hasJantou = Math.random()<0.8;
-    let tatsu = 8 - targetShanten - 2*mentsu - (hasJantou?1:0);
-    tatsu = Math.max(0, Math.min(tatsu,5-mentsu));
-    if (mentsu+tatsu>5) continue;
-    if (hasJantou && !generateToitsu(hand)) continue;
-    for(let i=0;i<mentsu;i++){
+    const mentsuCount = getRandomInt(5);
+    const hasJantou = Math.random() < 0.8;
+    let tatsuCount = 8 - targetShanten - mentsuCount*2 - (hasJantou?1:0);
+    tatsuCount = Math.max(0, Math.min(tatsuCount, 5-mentsuCount));
+    if (mentsuCount + tatsuCount > 5) continue;
+
+    // 雀頭
+    if (hasJantou) {
+      if (!generateToitsu(hand)) continue;
+    }
+    // 面子
+    for (let i=0;i<mentsuCount;i++) {
       if (Math.random()<0.5) {
-        if(!generateKoutsu(hand)){ i--; continue; }
+        if (!generateKoutsu(hand)) { i--; continue; }
       } else {
-        if(!generateShuntsu(hand)){ i--; continue; }
+        if (!generateShuntsu(hand)) { i--; continue; }
       }
     }
-    for(let i=0;i<tatsu;i++){
-      if(!generateTatsu(hand)){ i--; continue; }
+    // ターツ
+    for (let i=0;i<tatsuCount;i++) {
+      if (!generateTatsu(hand)) { i--; continue; }
     }
-    let cnt = hand.reduce((a,b)=>a+b,0);
-    if(cnt>13) continue;
-    while(cnt<13){ const t = getRandomTile(hand); hand[t]++; cnt++; }
-    if(cnt===13 && calculateShanten(hand)===targetShanten){ return hand; }
+    // 補充
+    let count = hand.reduce((a,b)=>a+b,0);
+    if (count>13) continue;
+    while(count<13) {
+      const t = getRandomTile(hand);
+      hand[t]++;
+      count++;
+    }
+    if (count===13 && calculateShanten(hand)===targetShanten) return hand;
   }
 }
 
-function calculateShanten(h){
+// シャンテン計算（一般/七対子/国士）
+function calculateShanten(hand) {
   return Math.min(
-    calculateNormalShanten(h),
-    calculateChiitoiShanten(h),
-    calculateKokushiShanten(h)
+    calculateNormalShanten(hand),
+    calculateChiitoiShanten(hand),
+    calculateKokushiShanten(hand)
   );
 }
 
-function calculateNormalShanten(hand){
-  let minSh=8;
-  function dfs(tiles, m,t,p,idx){
-    if(m>4) return;
-    while(idx<34 && tiles[idx]===0) idx++;
-    if(idx>=34){
-      const sh= (4-m)*2 + (p?0:1) - t;
-      minSh = Math.min(minSh, sh);
-      return;
-    }
-    dfs(tiles,m,t,p,idx+1);
-    if(!p && tiles[idx]>=2){ tiles[idx]-=2; dfs(tiles,m,t,true,idx); tiles[idx]+=2; }
-    if(tiles[idx]>=4){
-      // 槓子を3枚取り、残1枚を孤立牌扱い
-      tiles[idx]-=3; dfs(tiles,m+1,t,p,idx); tiles[idx]+=3;
-      // 1枚残してターツ可
-      tiles[idx]--; dfs(tiles,m,t+1,p,idx); tiles[idx]++;
-    } else if(tiles[idx]>=3){ tiles[idx]-=3; dfs(tiles,m+1,t,p,idx); tiles[idx]+=3; }
-    if(idx<27 && idx%9<=6 && tiles[idx]&&tiles[idx+1]&&tiles[idx+2]){
-      tiles[idx]--;tiles[idx+1]--;tiles[idx+2]--;
-      dfs(tiles,m+1,t,p,idx);
-      tiles[idx]++;tiles[idx+1]++;tiles[idx+2]++;
-    }
-    if(m+t<4){
-      if(tiles[idx]>=2){ tiles[idx]-=2; dfs(tiles,m,t+1,p,idx); tiles[idx]+=2; }
-      if(idx<27 && idx%9<=7 && tiles[idx]&&tiles[idx+1]){ tiles[idx]--;tiles[idx+1]--; dfs(tiles,m,t+1,p,idx); tiles[idx]++;tiles[idx+1]++; }
-      if(idx<27 && idx%9<=6 && tiles[idx]&&tiles[idx+2]){ tiles[idx]--;tiles[idx+2]--; dfs(tiles,m,t+1,p,idx); tiles[idx]++;tiles[idx+2]++; }
+function calculateNormalShanten(hand) {
+  let minShanten = 8;
+  // 雀頭なし
+  minShanten = Math.min(minShanten, findMentsuTatsu([...hand], false));
+  // 各対子を雀頭として固定
+  for (let i=0;i<34;i++) {
+    if (hand[i]>=2) {
+      const tmp = [...hand];
+      tmp[i] -= 2;
+      minShanten = Math.min(minShanten, findMentsuTatsu(tmp, true));
     }
   }
-  dfs([...hand],0,0,false,0);
+  return minShanten;
+}
+
+function findMentsuTatsu(hand, hasJantou) {
+  let minSh = 8;
+  function dfs(tiles, mentsu, tatsu, idx) {
+    if (idx>=34) {
+      let s = 8 - mentsu*2 - tatsu - (hasJantou?1:0);
+      if (mentsu + tatsu > 4) s += (mentsu+tatsu-4);
+      minSh = Math.min(minSh, s);
+      return;
+    }
+    if (tiles[idx]===0) return dfs(tiles, mentsu, tatsu, idx+1);
+    // 孤立牌
+    dfs(tiles, mentsu, tatsu, idx+1);
+    // 槓子
+    if (tiles[idx]>=4) {
+      tiles[idx]-=3;
+      dfs(tiles, mentsu+1, tatsu, idx);
+      tiles[idx]+=3;
+    }
+    // 刻子
+    if (tiles[idx]>=3) {
+      tiles[idx]-=3;
+      dfs(tiles, mentsu+1, tatsu, idx);
+      tiles[idx]+=3;
+    }
+    // 順子
+    if (idx<27 && idx%9<=6 && tiles[idx]>0 && tiles[idx+1]>0 && tiles[idx+2]>0) {
+      tiles[idx]--; tiles[idx+1]--; tiles[idx+2]--;
+      dfs(tiles, mentsu+1, tatsu, idx);
+      tiles[idx]++; tiles[idx+1]++; tiles[idx+2]++;
+    }
+    // ターツ
+    if (mentsu+tatsu<4) {
+      // 対子ターツ
+      if (tiles[idx]>=2) {
+        tiles[idx]-=2;
+        dfs(tiles, mentsu, tatsu+1, idx);
+        tiles[idx]+=2;
+      }
+      // 両面ターツ
+      if (idx<27 && idx%9<=7 && tiles[idx]>0 && tiles[idx+1]>0) {
+        tiles[idx]--; tiles[idx+1]--;
+        dfs(tiles, mentsu, tatsu+1, idx);
+        tiles[idx]++; tiles[idx+1]++;
+      }
+      // 嵌張ターツ
+      if (idx<27 && idx%9<=6 && tiles[idx]>0 && tiles[idx+2]>0) {
+        tiles[idx]--; tiles[idx+2]--;
+        dfs(tiles, mentsu, tatsu+1, idx);
+        tiles[idx]++; tiles[idx+2]++;
+      }
+    }
+  }
+  dfs([...hand],0,0,0);
   return minSh;
 }
 
-function calculateChiitoiShanten(hand){
-  let pairs=0,kinds=0;
-  for(let i=0;i<34;i++){ if(hand[i]>0) kinds++; if(hand[i]>=2) pairs++; }
-  let sh=6-pairs;
-  if(pairs<7 && kinds<7) sh+=(7-kinds);
-  return sh;
+function calculateChiitoiShanten(hand) {
+  let pairs = 0;
+  for(let i=0;i<34;i++) if(hand[i]>=2) pairs++;
+  return 6 - pairs;
 }
 
-function calculateKokushiShanten(hand){
-  const yaochu=[0,8,9,17,18,26,27,28,29,30,31,32,33];
-  let uniq=0,pair=false;
-  for(const i of yaochu){ if(hand[i]>0){ uniq++; if(hand[i]>=2) pair=true; }}
-  return 13-uniq-(pair?1:0);
+function calculateKokushiShanten(hand) {
+  const yaochu = [0,8,9,17,18,26,27,28,29,30,31,32,33];
+  let unique=0, hasPair=false;
+  yaochu.forEach(i => {
+    if (hand[i]>0) unique++;
+    if (hand[i]>=2) hasPair=true;
+  });
+  return 13 - unique - (hasPair?1:0);
 }
 
-function calculateUkeire(hand){
-  const ukeire={}, orig=calculateShanten(hand);
-  if(orig>6) return ukeire;
-  for(let i=0;i<34;i++){
-    const before=hand[i]; hand[i]++;
-    if(calculateShanten(hand)<orig){ const rem=4-before; if(rem>0) ukeire[indexToTile(i)]=rem; }
-    hand[i]--;
-  }
-  // 槓子分割チェック
-  for(let k=0;k<34;k++){
-    if(hand[k]===4){
-      hand[k]=3;
-      for(let i=0;i<34;i++){
-        const before=hand[i]; hand[i]++;
-        if(calculateShanten(hand)<orig){ const rem= (ukeire[indexToTile(i)]||0) + (before<4?1:0);
-          ukeire[indexToTile(i)] = rem;
-        }
-        hand[i]--;
-      }
-      hand[k]=4;
+// 受け入れ計算
+function calculateUkeire(hand) {
+  const ukeire = {};
+  const orig = calculateShanten(hand);
+  if (orig>6) return ukeire;
+  for(let i=0;i<34;i++) {
+    const before = hand[i];
+    if (before>=4) continue;
+    hand[i]++;
+    if (calculateShanten(hand)<orig) {
+      const tile = indexToTile(i);
+      const remain = 4 - before;
+      if (remain>0) ukeire[tile] = remain;
     }
+    hand[i]--;
   }
   return ukeire;
 }
