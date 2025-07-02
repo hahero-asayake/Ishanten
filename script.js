@@ -52,15 +52,21 @@ function arrayToHand(arr) {
 const getRandomInt = max => Math.floor(Math.random()*max);
 
 // 牌プールからランダムに牌を選ぶ（4枚超え禁止）
-function getRandomTile(hand) {
+function getRandomTile(hand, suit = null) {
   let idx;
-  do { idx = getRandomInt(34); } while (hand[idx] >= 4);
+  if (suit === null) {
+    do { idx = getRandomInt(34); } while (hand[idx] >= 4);
+  } else {
+    const start = suit * 9;
+    const end = start + 9;
+    do { idx = start + getRandomInt(9); } while (hand[idx] >= 4);
+  }
   return idx;
 }
 
 // 刻子生成
-function generateKoutsu(hand) {
-  const t = getRandomTile(hand);
+function generateKoutsu(hand, suit = null) {
+  const t = getRandomTile(hand, suit);
   if (hand[t] <= 1) {
     hand[t] += 3;
     return true;
@@ -69,10 +75,10 @@ function generateKoutsu(hand) {
 }
 
 // 順子生成
-function generateShuntsu(hand) {
-  const suit = getRandomInt(3);
+function generateShuntsu(hand, suit = null) {
+  const s = suit === null ? getRandomInt(3) : suit;
   const start = getRandomInt(7);
-  const idx = suit*9 + start;
+  const idx = s*9 + start;
   if (idx+2 < 27 && idx%9 <= 6 && hand[idx]<4 && hand[idx+1]<4 && hand[idx+2]<4) {
     hand[idx]++; hand[idx+1]++; hand[idx+2]++;
     return true;
@@ -81,8 +87,8 @@ function generateShuntsu(hand) {
 }
 
 // 対子生成
-function generateToitsu(hand) {
-  const t = getRandomTile(hand);
+function generateToitsu(hand, suit = null) {
+  const t = getRandomTile(hand, suit);
   if (hand[t] <= 2) {
     hand[t] += 2;
     return true;
@@ -91,20 +97,20 @@ function generateToitsu(hand) {
 }
 
 // ターツ生成
-function generateTatsu(hand) {
-  const suit = getRandomInt(3);
+function generateTatsu(hand, suit = null) {
+  const s = suit === null ? getRandomInt(3) : suit;
   const type = getRandomInt(3);
   let idx;
   switch(type) {
     case 0: // 両面
-      idx = suit*9 + 1 + getRandomInt(7);
+      idx = s*9 + 1 + getRandomInt(7);
       if (idx<27 && idx%9<=6 && hand[idx]<4 && hand[idx+1]<4) {
         hand[idx]++; hand[idx+1]++;
         return true;
       }
       break;
     case 1: // 嵌張
-      idx = suit*9 + getRandomInt(7);
+      idx = s*9 + getRandomInt(7);
       if (idx<27 && hand[idx]<4 && hand[idx+2]<4) {
         hand[idx]++; hand[idx+2]++;
         return true;
@@ -112,7 +118,7 @@ function generateTatsu(hand) {
       break;
     case 2: // 辺張
       const side = getRandomInt(2);
-      idx = suit*9 + (side===0?0:7);
+      idx = s*9 + (side===0?0:7);
       if (idx<27 && hand[idx]<4 && hand[idx+1]<4) {
         hand[idx]++; hand[idx+1]++;
         return true;
@@ -123,7 +129,9 @@ function generateTatsu(hand) {
 }
 
 // 指定シャンテン数の手牌を生成
-function generateHand(targetShanten) {
+function generateHand(targetShanten, isChinitsu) {
+  const suit = isChinitsu ? getRandomInt(3) : null; // 0:m, 1:p, 2:s
+
   while(true) {
     const hand = Array(34).fill(0);
     const mentsuCount = getRandomInt(5);
@@ -134,25 +142,25 @@ function generateHand(targetShanten) {
 
     // 雀頭
     if (hasJantou) {
-      if (!generateToitsu(hand)) continue;
+      if (!generateToitsu(hand, suit)) continue;
     }
     // 面子
     for (let i=0;i<mentsuCount;i++) {
-      if (Math.random()<0.5) {
-        if (!generateKoutsu(hand)) { i--; continue; }
+      if (isChinitsu || Math.random()<0.5) { // 清一色なら刻子優先度はなし
+        if (!generateKoutsu(hand, suit)) { i--; continue; }
       } else {
-        if (!generateShuntsu(hand)) { i--; continue; }
+        if (!generateShuntsu(hand, suit)) { i--; continue; }
       }
     }
     // ターツ
     for (let i=0;i<tatsuCount;i++) {
-      if (!generateTatsu(hand)) { i--; continue; }
+      if (!generateTatsu(hand, suit)) { i--; continue; }
     }
     // 補充
     let count = hand.reduce((a,b)=>a+b,0);
     if (count>13) continue;
     while(count<13) {
-      const t = getRandomTile(hand);
+      const t = getRandomTile(hand, suit);
       hand[t]++;
       count++;
     }
@@ -322,6 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('shanten-select').addEventListener('change', generateNewProblem);
     document.getElementById('min-ukeire').addEventListener('change', generateNewProblem);
     document.getElementById('max-ukeire').addEventListener('change', generateNewProblem);
+    document.getElementById('chinitsu-checkbox').addEventListener('change', generateNewProblem);
 
     // 中断ボタンのイベントリスナー
     document.getElementById('cancel-generation-btn').addEventListener('click', () => {
@@ -330,11 +339,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 非同期で手牌を生成するループ
-async function generateHandLoop(targetShanten, minUkeire, maxUkeire) {
+async function generateHandLoop(targetShanten, minUkeire, maxUkeire, isChinitsu) {
     let handArray, ukeire, ukeireCount;
     let attempts = 0;
     while (!generationCancelled) {
-        handArray = generateHand(targetShanten);
+        handArray = generateHand(targetShanten, isChinitsu);
         ukeire = calculateUkeire(handArray);
         ukeireCount = Object.values(ukeire).reduce((sum, count) => sum + count, 0);
 
@@ -361,8 +370,9 @@ function generateNewProblem() {
         const targetShanten = parseInt(document.getElementById('shanten-select').value);
         const minUkeire = parseInt(document.getElementById('min-ukeire').value);
         const maxUkeire = parseInt(document.getElementById('max-ukeire').value);
+        const isChinitsu = document.getElementById('chinitsu-checkbox').checked;
 
-        const handArray = await generateHandLoop(targetShanten, minUkeire, maxUkeire);
+        const handArray = await generateHandLoop(targetShanten, minUkeire, maxUkeire, isChinitsu);
 
         loaderOverlay.style.display = 'none';
 
