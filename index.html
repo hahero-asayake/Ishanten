@@ -1,39 +1,60 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>受け入れ枚数練習</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#667eea">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7058313793336590"
-     crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#667eea" />
+    <!-- Google AdSense -->
+    <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7058313793336590"
+        crossorigin="anonymous"
+    ></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BE6C28P61K"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag("js", new Date());
+
+        gtag("config", "G-BE6C28P61K");
+    </script>
 </head>
+
 <body>
     <!-- PC用広告（左） -->
     <div class="ad-container-side ad-left">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-7058313793336590"
-             data-ad-slot="9503405133"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+        <ins
+            class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-7058313793336590"
+            data-ad-slot="9503405133"
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+        ></ins>
         <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
+            (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
     </div>
 
     <!-- PC用広告（右） -->
     <div class="ad-container-side ad-right">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-7058313793336590"
-             data-ad-slot="9503405133"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+        <ins
+            class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-7058313793336590"
+            data-ad-slot="9503405133"
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+        ></ins>
         <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
+            (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
     </div>
 
@@ -42,8 +63,10 @@
         <p>手牌を生成中...</p>
         <button id="cancel-generation-btn" class="action-btn giveup">中断</button>
     </div>
+
     <div class="container">
         <h1>受け入れ枚数練習</h1>
+
         <div class="settings-wrapper">
             <button id="settings-toggle-btn">設定 ▼</button>
             <div id="settings-panel" class="settings" style="display: none;">
@@ -56,37 +79,41 @@
                         <option value="3">サンシャンテン</option>
                     </select>
                 </div>
+
                 <div class="setting-item">
                     <label for="min-ukeire">受け入れ枚数:</label>
                     <div class="range-inputs">
-                        <input type="number" id="min-ukeire" value="1" min="1">
+                        <input type="number" id="min-ukeire" value="1" min="1" />
                         <span>～</span>
-                        <input type="number" id="max-ukeire" value="123" min="1">
+                        <input type="number" id="max-ukeire" value="123" min="1" />
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="game-area">
             <div class="display-area">
                 <div class="display-tabs">
                     <button id="tab-hand" class="tab-btn active">手牌</button>
                     <button id="tab-ukeire" class="tab-btn" disabled>受け入れ</button>
                 </div>
+
                 <div id="hand-view" class="tab-content active">
                     <div id="tiles-container" class="tiles-container">
                         <!-- 牌が動的に表示されます -->
                     </div>
                 </div>
+
                 <div id="ukeire-view" class="tab-content">
-                     <div id="ukeire-tiles" class="tiles-container"></div>
+                    <div id="ukeire-tiles" class="tiles-container"></div>
                 </div>
             </div>
-            
+
             <div class="main-content">
                 <div class="question-area">
                     <h3 id="question-text">この手牌の受け入れ枚数は？</h3>
                     <div id="result-message" class="result-message"></div>
-                    
+
                     <div class="calculator">
                         <div id="display" class="display">0</div>
                         <div class="button-grid">
@@ -105,39 +132,56 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="action-buttons">
-                    <button id="submit-btn" class="action-btn submit" onclick="submitAnswer()">回答</button>
+                    <button id="submit-btn" class="action-btn submit" onclick="submitAnswer()">
+                        回答
+                    </button>
                     <button id="giveup-btn" class="action-btn giveup" onclick="giveUp()">あきらめる</button>
-                    <button id="next-btn" class="action-btn next" onclick="nextProblem()" style="display: none;">次の問題</button>
+                    <button
+                        id="next-btn"
+                        class="action-btn next"
+                        onclick="nextProblem()"
+                        style="display: none;"
+                    >
+                        次の問題
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <script src="script.js"></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker
+                    .register("/sw.js")
+                    .then((registration) => {
+                        console.log(
+                            "ServiceWorker registration successful with scope: ",
+                            registration.scope
+                        );
+                    })
+                    .catch((err) => {
+                        console.log("ServiceWorker registration failed: ", err);
+                    });
             });
         }
     </script>
 
     <!-- モバイル用広告 -->
     <div class="ad-container-bottom">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-7058313793336590"
-             data-ad-slot="9503405133"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+        <ins
+            class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-7058313793336590"
+            data-ad-slot="9503405133"
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+        ></ins>
         <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
+            (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
     </div>
 </body>
