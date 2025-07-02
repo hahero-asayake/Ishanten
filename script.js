@@ -246,4 +246,283 @@ function calculateUkeire(hand){
   return ukeire;
 }
 
-// 以下、UI制御やイベントリスナー部分は元のまま…
+
+// ゲーム状態
+let currentHand = [];
+let currentUkeire = {};
+let currentAnswer = 0;
+let gameState = 'playing';
+let generationCancelled = false;
+let generationTimeoutId = null;
+
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+    // UI要素の取得
+    const settingsToggleBtn = document.getElementById('settings-toggle-btn');
+    const settingsPanel = document.getElementById('settings-panel');
+    const tabHand = document.getElementById('tab-hand');
+    const tabUkeire = document.getElementById('tab-ukeire');
+    const handView = document.getElementById('hand-view');
+    const ukeireView = document.getElementById('ukeire-view');
+
+    // 設定のアコーディオン機能
+    settingsToggleBtn.addEventListener('click', () => {
+        const isHidden = settingsPanel.style.display === 'none';
+        settingsPanel.style.display = isHidden ? 'flex' : 'none';
+        settingsToggleBtn.textContent = isHidden ? '設定 ▲' : '設定 ▼';
+    });
+
+    // タブ切り替え機能
+    tabHand.addEventListener('click', () => {
+        handView.classList.add('active');
+        ukeireView.classList.remove('active');
+        tabHand.classList.add('active');
+        tabUkeire.classList.remove('active');
+    });
+
+    tabUkeire.addEventListener('click', () => {
+        ukeireView.classList.add('active');
+        handView.classList.remove('active');
+        tabUkeire.classList.add('active');
+        tabHand.classList.remove('active');
+    });
+
+    // 初回問題生成
+    generateNewProblem();
+    
+    // 設定変更時に新しい問題を生成
+    document.getElementById('shanten-select').addEventListener('change', generateNewProblem);
+    document.getElementById('min-ukeire').addEventListener('change', generateNewProblem);
+    document.getElementById('max-ukeire').addEventListener('change', generateNewProblem);
+
+    // 中断ボタンのイベントリスナー
+    document.getElementById('cancel-generation-btn').addEventListener('click', () => {
+        generationCancelled = true;
+    });
+});
+
+// 非同期で手牌を生成するループ
+async function generateHandLoop(targetShanten, minUkeire, maxUkeire) {
+    let handArray, ukeire, ukeireCount;
+    let attempts = 0;
+    while (!generationCancelled) {
+        handArray = generateHand(targetShanten);
+        ukeire = calculateUkeire(handArray);
+        ukeireCount = Object.values(ukeire).reduce((sum, count) => sum + count, 0);
+
+        if (ukeireCount >= minUkeire && ukeireCount <= maxUkeire) {
+            return handArray; // 条件に合う手牌が見つかった
+        }
+        
+        attempts++;
+        if (attempts % 100 === 0) { // 100回ごとにメインスレッドを解放
+            await new Promise(resolve => setTimeout(resolve, 0));
+        }
+    }
+    return null; // 中断された
+}
+
+// 新しい問題を生成
+function generateNewProblem() {
+    const loaderOverlay = document.getElementById('loader-overlay');
+    generationCancelled = false;
+    loaderOverlay.style.display = 'flex';
+
+    // UIの更新を待ってから重い処理を開始する
+    setTimeout(async () => {
+        const targetShanten = parseInt(document.getElementById('shanten-select').value);
+        const minUkeire = parseInt(document.getElementById('min-ukeire').value);
+        const maxUkeire = parseInt(document.getElementById('max-ukeire').value);
+
+        const handArray = await generateHandLoop(targetShanten, minUkeire, maxUkeire);
+
+        loaderOverlay.style.display = 'none';
+
+        if (generationCancelled || handArray === null) {
+            console.log("手牌の生成が中断されました。");
+            // もし中断された場合、UIを操作可能な状態に戻すか、何らかのフィードバックをユーザーに与える
+            // 例えば、中断メッセージを表示するなど。現状では何もしない。
+            return;
+        }
+        
+        const ukeire = calculateUkeire(handArray);
+        
+        currentHand = arrayToHand(handArray);
+        currentUkeire = ukeire;
+        currentAnswer = Object.values(ukeire).reduce((sum, count) => sum + count, 0);
+        
+        // 理牌（ソート）
+        currentHand.sort((a, b) => tileToIndex(a) - tileToIndex(b));
+        
+        displayHand(currentHand);
+        resetUI();
+        gameState = 'playing';
+    }, 10); // わずかな遅延を与える
+}
+
+// 牌の文字列から画像ファイル名を取得
+function getTileImageFilename(tile) {
+    // 赤ドラの場合
+    if (tile === '0m') return 'aka3-66-90-l-emb.png';
+    if (tile === '0p') return 'aka1-66-90-l-emb.png';
+    if (tile === '0s') return 'aka2-66-90-l-emb.png';
+
+    const suit = tile.slice(-1);
+    const num = tile.slice(0, -1);
+
+    let suitName;
+    switch (suit) {
+        case 'm': suitName = 'man'; break;
+        case 'p': suitName = 'pin'; break;
+        case 's': suitName = 'sou'; break;
+        default: // 字牌
+            const honors = ['東', '南', '西', '北', '白', '發', '中'];
+            const honorIndex = honors.indexOf(tile) + 1;
+            return `ji${honorIndex}-66-90-l-emb.png`;
+    }
+    return `${suitName}${num}-66-90-l-emb.png`;
+}
+
+// 手牌を表示
+function displayHand(hand) {
+    const container = document.getElementById('tiles-container');
+    container.innerHTML = '';
+    
+    hand.forEach(tile => {
+        const imgElement = document.createElement('img');
+        imgElement.src = `pai-images/${getTileImageFilename(tile)}`;
+        imgElement.className = 'tile';
+        imgElement.setAttribute('title', TILE_NAMES[tile] || tile);
+        container.appendChild(imgElement);
+    });
+}
+
+// 受け入れ牌を表示
+function displayUkeire(ukeire) {
+    const container = document.getElementById('ukeire-tiles');
+    container.innerHTML = '';
+
+    const sortedUkeire = Object.keys(ukeire).sort((a, b) => tileToIndex(a) - tileToIndex(b));
+
+    sortedUkeire.forEach(tile => {
+        const tileWrapper = document.createElement('div');
+        tileWrapper.className = 'ukeire-tile-wrapper';
+
+        const imgElement = document.createElement('img');
+        imgElement.src = `pai-images/${getTileImageFilename(tile)}`;
+        imgElement.className = 'tile';
+        imgElement.setAttribute('title', TILE_NAMES[tile] || tile);
+
+        const countElement = document.createElement('span');
+        countElement.className = 'ukeire-count';
+        countElement.textContent = `${ukeire[tile]}枚`;
+        
+        tileWrapper.appendChild(imgElement);
+        tileWrapper.appendChild(countElement);
+        container.appendChild(tileWrapper);
+    });
+
+    // 受け入れタブを有効化して表示を切り替える
+    document.getElementById('tab-ukeire').disabled = false;
+    document.getElementById('tab-ukeire').click();
+}
+
+// 電卓機能
+function appendNumber(number) {
+    const display = document.getElementById('display');
+    if (display.textContent === '0') {
+        display.textContent = number;
+    } else {
+        display.textContent += number;
+    }
+}
+
+function clearDisplay() {
+    document.getElementById('display').textContent = '0';
+}
+
+function deleteLast() {
+    const display = document.getElementById('display');
+    if (display.textContent.length > 1) {
+        display.textContent = display.textContent.slice(0, -1);
+    } else {
+        display.textContent = '0';
+    }
+}
+
+// 回答を提出
+function submitAnswer() {
+    if (gameState !== 'playing') return;
+    
+    const userAnswer = parseInt(document.getElementById('display').textContent);
+    const resultMessage = document.getElementById('result-message');
+    const nextBtn = document.getElementById('next-btn');
+    const questionText = document.getElementById('question-text');
+    
+    if (userAnswer === currentAnswer) {
+        resultMessage.textContent = '正解！';
+        resultMessage.className = 'result-message correct visible';
+        nextBtn.style.display = 'block';
+        questionText.style.display = 'none';
+        gameState = 'answered';
+        displayUkeire(currentUkeire);
+        disableButtons();
+    } else {
+        resultMessage.textContent = `不正解です。もう一度挑戦してください。`;
+        resultMessage.className = 'result-message incorrect visible';
+        nextBtn.style.display = 'none';
+    }
+}
+
+// あきらめる
+function giveUp() {
+    if (gameState !== 'playing') return;
+    
+    const resultMessage = document.getElementById('result-message');
+    const nextBtn = document.getElementById('next-btn');
+    const questionText = document.getElementById('question-text');
+    
+    resultMessage.textContent = `正解は ${currentAnswer} 枚でした。`;
+    resultMessage.className = 'result-message answer visible';
+    nextBtn.style.display = 'block';
+    questionText.style.display = 'none';
+    gameState = 'given_up';
+    displayUkeire(currentUkeire);
+    disableButtons();
+}
+
+// 次の問題
+function nextProblem() {
+    generateNewProblem();
+}
+
+// UIをリセット
+function resetUI() {
+    document.getElementById('display').textContent = '0';
+    document.getElementById('result-message').className = 'result-message'; // visibleクラスを削除
+    document.getElementById('question-text').style.display = 'block';
+    document.getElementById('next-btn').style.display = 'none';
+    
+    // タブを初期状態に戻す
+    document.getElementById('tab-hand').click();
+    document.getElementById('tab-ukeire').disabled = true;
+    document.getElementById('ukeire-tiles').innerHTML = '';
+
+    enableButtons();
+}
+
+// ボタンを無効化
+function disableButtons() {
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('giveup-btn').disabled = true;
+    const calcBtns = document.querySelectorAll('.calc-btn');
+    calcBtns.forEach(btn => btn.disabled = true);
+}
+
+// ボタンを有効化
+function enableButtons() {
+    document.getElementById('submit-btn').disabled = false;
+    document.getElementById('giveup-btn').disabled = false;
+    const calcBtns = document.querySelectorAll('.calc-btn');
+    calcBtns.forEach(btn => btn.disabled = false);
+}
