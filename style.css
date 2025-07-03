@@ -33,7 +33,7 @@ body {
     align-items: center;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 12px;
+    padding: 8px;
     flex-shrink: 0;
     position: relative;
 }
@@ -206,7 +206,7 @@ h1 {
     gap: 15px;
     align-items: center;
     flex-grow: 1;
-    justify-content: space-between; /* 要素を上下に配置 */
+    justify-content: center; /* 要素を上下に配置 */
 }
 
 .question-area {
@@ -437,7 +437,7 @@ h1 {
     }
     h1 {
         font-size: 1.2rem;
-        padding: 12px;
+        padding: 8px;
     }
     .game-area {
         padding: 10px;

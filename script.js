@@ -522,7 +522,7 @@ function submitAnswer() {
         displayUkeire(currentUkeire);
         disableButtons();
     } else {
-        questionText.textContent = `不正解です。もう一度挑戦してください。`;
+        questionText.textContent = `不正解です。再挑戦してください。`;
         questionText.className = 'incorrect';
         nextBtn.style.display = 'none';
     }
