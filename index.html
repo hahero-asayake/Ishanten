@@ -3,7 +3,18 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>受け入れ枚数練習</title>
+    <title>麻雀 受け入れ枚数練習</title>
+    <meta name="description" content="麻雀の受け入れ枚数計算を練習できるトレーニングアプリ。様々なシャンテン数や条件で問題に挑戦し、何切る問題の基礎力を鍛えよう。">
+    <meta name="keywords" content="麻雀, 受け入れ枚数, 何切る, シャンテン数, トレーニング, 練習, PWA">
+    <!-- OGP -->
+    <meta property="og:title" content="麻雀 受け入れ枚数練習">
+    <meta property="og:description" content="麻雀の受け入れ枚数計算を練習できるトレーニングアプリ。様々なシャンテン数や条件で問題に挑戦し、何切る問題の基礎力を鍛えよう。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://magur.github.io/Ishanten/">
+    <meta property="og:image" content="https://magur.github.io/Ishanten/pai-images/ogp_image.png">
+    <meta property="og:site_name" content="麻雀 受け入れ枚数練習">
+    <meta name="twitter:card" content="summary_large_image">
+
     <link rel="stylesheet" href="style.css" />
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#667eea" />
@@ -65,7 +76,10 @@
     </div>
 
     <div class="container">
-        <h1>受け入れ枚数練習</h1>
+        <div class="title-container">
+            <h1>麻雀・受け入れ枚数練習</h1>
+            <button id="help-btn" class="help-button">？</button>
+        </div>
 
         <div class="settings-wrapper">
             <button id="settings-toggle-btn">設定 ▼</button>
@@ -192,6 +206,27 @@
         <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
+    </div>
+
+    <!-- 遊び方モーダル -->
+    <div id="help-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button id="close-modal-btn" class="close-button">&times;</button>
+            <h2>遊び方</h2>
+            <ol>
+                <li>画面上部の「設定 ▼」から、練習したい<strong>シャンテン数</strong>、<strong>受け入れ枚数の範囲</strong>、<strong>清一色モード</strong>を設定します。</li>
+                <li>設定が終わると、条件に合った問題が自動で生成されます。</li>
+                <li>表示された13枚の手牌を確認し、テンパイするための受け入れ枚数を計算します。</li>
+                <li>画面下の電卓で計算した枚数を入力します。</li>
+                <li>「回答」ボタンを押して答え合わせをします。
+                    <ul>
+                        <li><strong>正解の場合</strong>: 「受け入れ」タブが有効になり、受け入れ牌を確認できます。「次の問題」で新しい問題に進みます。</li>
+                        <li><strong>不正解の場合</strong>: メッセージが表示され、再挑戦できます。</li>
+                    </ul>
+                </li>
+                <li>答えがわからない場合は、「あきらめる」ボタンで正解と受け入れ牌一覧を確認できます。</li>
+            </ol>
+        </div>
     </div>
 </body>
 </html>

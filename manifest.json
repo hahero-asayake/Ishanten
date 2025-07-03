@@ -3,6 +3,7 @@
   "short_name": "受け入れ枚数",
   "start_url": ".",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#667eea",
   "theme_color": "#667eea",
   "description": "麻雀の受け入れ枚数を計算する練習アプリです。",
@@ -13,14 +14,16 @@
       "type": "image/png"
     },
     {
-      "src": "pai-images/man5-66-90-l-emb.png",
-      "sizes": "66x90",
-      "type": "image/png"
+      "src": "pai-images/pin5-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "pai-images/pin5-66-90-l-emb.png",
-      "sizes": "66x90",
-      "type": "image/png"
+      "src": "pai-images/man5-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

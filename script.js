@@ -300,6 +300,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabUkeire = document.getElementById('tab-ukeire');
     const handView = document.getElementById('hand-view');
     const ukeireView = document.getElementById('ukeire-view');
+    const helpBtn = document.getElementById('help-btn');
+    const helpModal = document.getElementById('help-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+
+    // 遊び方モーダルの表示
+    helpBtn.addEventListener('click', () => {
+        helpModal.style.display = 'flex';
+    });
+
+    // 遊び方モーダルの非表示
+    closeModalBtn.addEventListener('click', () => {
+        helpModal.style.display = 'none';
+    });
+    helpModal.addEventListener('click', (e) => {
+        if (e.target === helpModal) {
+            helpModal.style.display = 'none';
+        }
+    });
 
     // 設定のアコーディオン機能
     settingsToggleBtn.addEventListener('click', () => {
