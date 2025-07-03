@@ -11,7 +11,7 @@ body {
     justify-content: center;
     align-items: flex-start; /* 上揃えに変更 */
     min-height: 100vh;
-    padding: 20px 0; /* 上下に余白を追加 */
+    padding: 10px 0; /* 上下に余白を追加 */
     box-sizing: border-box;
 }
 
@@ -24,7 +24,8 @@ body {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    min-height: calc(100vh - 40px); /* 上下のpadding分を引く */
+    min-height: calc(100vh - 20px); /* 上下のpadding分を引く */
+    padding-bottom: 70px; /* 下部広告の基本余白 */
 }
 
 .title-container {
@@ -33,7 +34,7 @@ body {
     align-items: center;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 8px;
+    padding: 6px;
     flex-shrink: 0;
     position: relative;
 }
@@ -41,7 +42,7 @@ body {
 h1 {
     text-align: center;
     margin: 0;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 700;
 }
 
@@ -73,7 +74,7 @@ h1 {
 
 #settings-toggle-btn {
     width: 100%;
-    padding: 10px;
+    padding: 8px 10px;
     background: none;
     border: none;
     font-size: 1rem;
@@ -84,12 +85,12 @@ h1 {
 }
 
 .settings {
-    padding: 10px 0 15px;
+    padding: 8px 0 10px;
     background: #f1f3f5;
     border-top: 1px solid #dee2e6;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .setting-item {
@@ -122,15 +123,16 @@ h1 {
 }
 
 .game-area {
-    padding: 15px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     flex-grow: 1; /* .container内で残りの高さを埋める */
+    gap: 10px;
 }
 
 .display-area {
-    margin-bottom: 5px;
     flex-shrink: 0;
+    min-height: 165px; /* タブの高さ(約40px) + コンテンツの最大高さ(125px) */
 }
 
 .display-tabs {
@@ -140,7 +142,7 @@ h1 {
 
 .tab-btn {
     flex: 1;
-    padding: 10px;
+    padding: 8px;
     font-size: 1rem;
     font-weight: 600;
     border: 1px solid #dee2e6;
@@ -168,7 +170,7 @@ h1 {
     border: 1px solid #dee2e6;
     border-radius: 0 0 8px 8px;
     padding: 4px;
-    max-height: 140px;
+    max-height: 125px;
     overflow-y: auto;
 }
 
@@ -203,7 +205,7 @@ h1 {
 .main-content {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
     align-items: center;
     flex-grow: 1;
     justify-content: center; /* 要素を上下に配置 */
@@ -219,9 +221,9 @@ h1 {
     font-size: 1.1rem;
     text-align: center;
     font-weight: bold;
-    padding: 10px;
+    padding: 8px;
     border-radius: 8px;
-    min-height: 45px;
+    min-height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -250,7 +252,7 @@ h1 {
 .calculator {
     background: #f8f9fa;
     border-radius: 15px;
-    padding: 10px;
+    padding: 8px;
     margin: 0 auto;
     max-width: 280px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -274,14 +276,14 @@ h1 {
 .button-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 6px;
 }
 
 .calc-btn {
     background: white;
     border: 1px solid #dee2e6;
     border-radius: 8px;
-    padding: 10px;
+    padding: 8px;
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
@@ -295,14 +297,14 @@ h1 {
 
 .action-buttons {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
     width: 100%;
-    margin-bottom: 5px; /* ボタン下の余白を追加 */
+    margin-bottom: 0; /* ボタン下の余白を追加 */
 }
 
 .action-btn {
-    padding: 10px;
+    padding: 8px;
     font-size: 1rem;
     font-weight: bold;
     border: none;
@@ -432,13 +434,13 @@ h1 {
         border-radius: 0;
         width: 100%;
         min-height: 100vh;
-        padding-bottom: 70px; /* 広告領域 + 少し余白 */
+        padding-bottom: 90px; /* 広告領域 + 少し余白 (モバイル用に上書き) */
         box-sizing: border-box;
         overflow-y: auto; /* コンテナ内をスクロール可能に */
     }
     h1 {
         font-size: 1.2rem;
-        padding: 8px;
+        padding: 6px;
     }
     .game-area {
         padding: 10px;
