@@ -509,23 +509,21 @@ function deleteLast() {
 // 回答を提出
 function submitAnswer() {
     if (gameState !== 'playing') return;
-    
+
     const userAnswer = parseInt(document.getElementById('display').textContent);
-    const resultMessage = document.getElementById('result-message');
     const nextBtn = document.getElementById('next-btn');
     const questionText = document.getElementById('question-text');
-    
+
     if (userAnswer === currentAnswer) {
-        resultMessage.textContent = '正解！';
-        resultMessage.className = 'result-message correct visible';
+        questionText.textContent = '正解！';
+        questionText.className = 'correct';
         nextBtn.style.display = 'block';
-        questionText.style.display = 'none';
         gameState = 'answered';
         displayUkeire(currentUkeire);
         disableButtons();
     } else {
-        resultMessage.textContent = `不正解です。もう一度挑戦してください。`;
-        resultMessage.className = 'result-message incorrect visible';
+        questionText.textContent = `不正解です。もう一度挑戦してください。`;
+        questionText.className = 'incorrect';
         nextBtn.style.display = 'none';
     }
 }
@@ -533,15 +531,13 @@ function submitAnswer() {
 // あきらめる
 function giveUp() {
     if (gameState !== 'playing') return;
-    
-    const resultMessage = document.getElementById('result-message');
+
     const nextBtn = document.getElementById('next-btn');
     const questionText = document.getElementById('question-text');
-    
-    resultMessage.textContent = `正解は ${currentAnswer} 枚でした。`;
-    resultMessage.className = 'result-message answer visible';
+
+    questionText.textContent = `正解は ${currentAnswer} 枚でした。`;
+    questionText.className = 'answer';
     nextBtn.style.display = 'block';
-    questionText.style.display = 'none';
     gameState = 'given_up';
     displayUkeire(currentUkeire);
     disableButtons();
@@ -555,8 +551,9 @@ function nextProblem() {
 // UIをリセット
 function resetUI() {
     document.getElementById('display').textContent = '0';
-    document.getElementById('result-message').className = 'result-message'; // visibleクラスを削除
-    document.getElementById('question-text').style.display = 'block';
+    const questionText = document.getElementById('question-text');
+    questionText.textContent = 'この手牌の受け入れ枚数は？';
+    questionText.className = '';
     document.getElementById('next-btn').style.display = 'none';
     
     // タブを初期状態に戻す

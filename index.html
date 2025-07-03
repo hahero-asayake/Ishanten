@@ -135,7 +135,6 @@
             <div class="main-content">
                 <div class="question-area">
                     <h3 id="question-text">この手牌の受け入れ枚数は？</h3>
-                    <div id="result-message" class="result-message"></div>
 
                     <div class="calculator">
                         <div id="display" class="display">0</div>
@@ -179,7 +178,7 @@
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
                 navigator.serviceWorker
-                    .register("/sw.js")
+                    .register("sw.js")
                     .then((registration) => {
                         console.log(
                             "ServiceWorker registration successful with scope: ",
