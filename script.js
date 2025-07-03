@@ -381,7 +381,11 @@ async function generateHandLoop(targetShanten, minUkeire, maxUkeire, isChinitsu)
 function generateNewProblem() {
     const loaderOverlay = document.getElementById('loader-overlay');
     generationCancelled = false;
-    loaderOverlay.style.display = 'flex';
+    
+    // 1秒以上かかったらローディング表示を出すタイマー
+    const loaderTimeout = setTimeout(() => {
+        loaderOverlay.style.display = 'flex';
+    }, 1000);
 
     // UIの更新を待ってから重い処理を開始する
     setTimeout(async () => {
@@ -392,6 +396,8 @@ function generateNewProblem() {
 
         const handArray = await generateHandLoop(targetShanten, minUkeire, maxUkeire, isChinitsu);
 
+        // 処理が1秒以内に終わったらタイマーをキャンセル
+        clearTimeout(loaderTimeout);
         loaderOverlay.style.display = 'none';
 
         if (generationCancelled || handArray === null) {

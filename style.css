@@ -298,6 +298,7 @@ h1 {
     gap: 10px;
     justify-content: center;
     width: 100%;
+    margin-bottom: 5px; /* ボタン下の余白を追加 */
 }
 
 .action-btn {
