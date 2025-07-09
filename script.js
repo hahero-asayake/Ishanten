@@ -250,7 +250,15 @@ function findMentsuTatsu(hand, hasJantou) {
 
 function calculateChiitoiShanten(hand) {
   let pairs = 0;
-  for(let i=0;i<34;i++) if(hand[i]>=2) pairs++;
+  let kinds = 0;
+  for (let i = 0; i < 34; i++) {
+    if (hand[i] > 0) kinds++;
+    if (hand[i] >= 2) pairs++;
+  }
+
+  // 例外処理：牌種6＆対子6 → イーシャンテン
+  if (pairs === 6 && kinds === 6) return 1;
+
   return 6 - pairs;
 }
 
