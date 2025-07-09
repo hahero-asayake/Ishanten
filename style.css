@@ -463,6 +463,18 @@ h1 {
     .ad-container-side {
         display: none !important; /* モバイルではサイド広告を強制的に非表示 */
     }
+    .credits {
+        text-align: center;
+    }
+
+    .credit-item a {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .credit-item .icon {
+        margin-right: 0;
+    }
 }
 
 /* PC表示用のメディアクエリ */
@@ -552,6 +564,8 @@ input:checked + .slider:before {
     max-width: 500px;
     position: relative;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .modal-content h2 {
