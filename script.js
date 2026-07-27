@@ -586,7 +586,8 @@ function disableButtons() {
     document.getElementById('giveup-btn').disabled = true;
     document.getElementById('submit-btn').style.display = 'none';
     document.getElementById('giveup-btn').style.display = 'none';
-    document.getElementById('share-btn').style.display = 'block';
+    const shareBtn = document.getElementById('share-btn');
+    if (shareBtn) shareBtn.style.display = 'block'; // SW更新過渡期の旧HTML+新JS混成でも既存機能を壊さない
     const calcBtns = document.querySelectorAll('.calc-btn');
     calcBtns.forEach(btn => btn.disabled = true);
 }
@@ -597,7 +598,8 @@ function enableButtons() {
     document.getElementById('giveup-btn').disabled = false;
     document.getElementById('submit-btn').style.display = '';
     document.getElementById('giveup-btn').style.display = '';
-    document.getElementById('share-btn').style.display = 'none';
+    const shareBtn = document.getElementById('share-btn');
+    if (shareBtn) shareBtn.style.display = 'none'; // 同上
     const calcBtns = document.querySelectorAll('.calc-btn');
     calcBtns.forEach(btn => btn.disabled = false);
 }

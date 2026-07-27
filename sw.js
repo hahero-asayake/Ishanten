@@ -16,7 +16,8 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        // cache:'reload' でブラウザHTTPキャッシュを迂回し、CDN更新窓での新旧混成の焼き込みを防ぐ
+        return cache.addAll(urlsToCache.map(u => new Request(u, { cache: 'reload' })));
       })
   );
 });
