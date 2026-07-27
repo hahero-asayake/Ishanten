@@ -330,6 +330,11 @@ h1 {
     color: white;
 }
 
+.action-btn.share {
+    background: #0f1419;
+    color: white;
+}
+
 .ukeire-tile-wrapper {
     display: flex;
     flex-direction: column;

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nanikiru-cache-v1';
+const CACHE_NAME = 'nanikiru-cache-v2';
 // キャッシュするファイルのリスト
 const urlsToCache = [
   '.',
@@ -11,6 +11,7 @@ const urlsToCache = [
 
 // インストールイベント
 self.addEventListener('install', event => {
+  self.skipWaiting(); // 新SWを待機なしで即時有効化
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -66,6 +67,6 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim()) // 開いている既存タブも新SWの管理下へ
   );
 });

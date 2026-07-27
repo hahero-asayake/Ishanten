@@ -349,8 +349,8 @@ document.addEventListener('DOMContentLoaded', function() {
         tabHand.classList.remove('active');
     });
 
-    // 初回問題生成
-    generateNewProblem();
+    // 初回問題生成（?q= 付きなら共有URLから復元）
+    if (!loadProblemFromQuery()) generateNewProblem();
     
     // 設定変更時に新しい問題を生成
     document.getElementById('shanten-select').addEventListener('change', generateNewProblem);
@@ -387,6 +387,8 @@ async function generateHandLoop(targetShanten, minUkeire, maxUkeire, isChinitsu)
 
 // 新しい問題を生成
 function generateNewProblem() {
+    // 全生成経路で共有URLのクエリを除去（表示中と別の問題のURLが残る事故防止）
+    history.replaceState(null, '', location.pathname);
     const loaderOverlay = document.getElementById('loader-overlay');
     generationCancelled = false;
     
@@ -582,6 +584,9 @@ function resetUI() {
 function disableButtons() {
     document.getElementById('submit-btn').disabled = true;
     document.getElementById('giveup-btn').disabled = true;
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('giveup-btn').style.display = 'none';
+    document.getElementById('share-btn').style.display = 'block';
     const calcBtns = document.querySelectorAll('.calc-btn');
     calcBtns.forEach(btn => btn.disabled = true);
 }
@@ -590,6 +595,98 @@ function disableButtons() {
 function enableButtons() {
     document.getElementById('submit-btn').disabled = false;
     document.getElementById('giveup-btn').disabled = false;
+    document.getElementById('submit-btn').style.display = '';
+    document.getElementById('giveup-btn').style.display = '';
+    document.getElementById('share-btn').style.display = 'none';
     const calcBtns = document.querySelectorAll('.calc-btn');
     calcBtns.forEach(btn => btn.disabled = false);
+}
+
+// ===== 共有URL・Xシェア =====
+
+// 手牌13枚(牌文字列配列) → mpsz文字列（正準形＝インデックス昇順・スート順 m→p→s→z）
+function encodeHand(hand) {
+    const idx = hand.map(tileToIndex).sort((a, b) => a - b);
+    const suitOf = i => i < 9 ? 'm' : i < 18 ? 'p' : i < 27 ? 's' : 'z';
+    const numOf  = i => i < 27 ? (i % 9) + 1 : i - 26;
+    let out = '', cur = '', lastSuit = null;
+    idx.forEach(i => {
+        const s = suitOf(i);
+        if (lastSuit !== null && s !== lastSuit) { out += cur + lastSuit; cur = ''; }
+        cur += numOf(i);
+        lastSuit = s;
+    });
+    if (lastSuit !== null) out += cur + lastSuit;
+    return out;
+}
+
+// mpsz文字列 → 手牌13枚(牌文字列配列)。不正なら null
+function decodeHand(q) {
+    if (typeof q !== 'string' || q.length === 0 || q.length > 30) return null;
+    if (!/^[1-9mpsz]+$/.test(q)) return null;
+    const tiles = [];
+    let digits = [];
+    for (const ch of q) {
+        if (ch >= '1' && ch <= '9') { digits.push(parseInt(ch)); continue; }
+        if (digits.length === 0) return null;          // スート文字の前に数字がない
+        for (const n of digits) {
+            if (ch === 'z') {
+                if (n > 7) return null;                 // 8z,9zは存在しない
+                tiles.push(indexToTile(27 + n - 1));
+            } else {
+                const base = ch === 'm' ? 0 : ch === 'p' ? 9 : 18;
+                tiles.push(indexToTile(base + n - 1));
+            }
+        }
+        digits = [];
+    }
+    if (digits.length !== 0) return null;               // 末尾にスートなしの数字
+    if (tiles.length !== 13) return null;               // 13枚ちょうどのみ
+    if (handToArray(tiles).some(c => c > 4)) return null; // 同一牌5枚以上
+    return tiles;
+}
+
+// クエリから問題を復元。復元したら true
+function loadProblemFromQuery() {
+    const q = new URLSearchParams(location.search).get('q');
+    if (!q) return false;
+    const tiles = decodeHand(q);
+    if (!tiles) {
+        console.warn('不正な共有クエリのためランダム生成にフォールバックします');
+        history.replaceState(null, '', location.pathname); // 不正クエリは除去
+        return false;
+    }
+    tiles.sort((a, b) => tileToIndex(a) - tileToIndex(b)); // 理牌
+    currentHand = tiles;
+    currentUkeire = calculateUkeire(handToArray(tiles));
+    currentAnswer = Object.values(currentUkeire).reduce((s, c) => s + c, 0);
+    displayHand(currentHand);
+    resetUI();
+    gameState = 'playing';
+    return true;
+}
+
+// 手牌 → Unicode麻雀牌絵文字（並びは正準形。字牌はmpsz数字順とUnicode順がズレるため対応表で変換）
+function handToEmoji(hand) {
+    const HONOR_CP = [0x1F000, 0x1F001, 0x1F002, 0x1F003, 0x1F006, 0x1F005, 0x1F004]; // 東南西北白發中
+    return hand.map(tileToIndex).sort((a, b) => a - b).map(i => {
+        let cp;
+        if (i < 9) cp = 0x1F007 + i;              // 萬子 🀇〜
+        else if (i < 18) cp = 0x1F019 + (i - 9);  // 筒子 🀙〜
+        else if (i < 27) cp = 0x1F010 + (i - 18); // 索子 🀐〜
+        else cp = HONOR_CP[i - 27];
+        return String.fromCodePoint(cp);
+    }).join('');
+}
+
+// Xでシェア（URLは必ず問題画面＝?q= のみ。答えは文面に含めない）
+function shareToX() {
+    const hand = encodeHand(currentHand);
+    const problemUrl = location.origin + location.pathname + '?q=' + hand;
+    const text = 'この手牌の受け入れ枚数、何枚かわかる？\n' + handToEmoji(currentHand);
+    const intent = 'https://twitter.com/intent/tweet'
+        + '?text=' + encodeURIComponent(text)
+        + '&url=' + encodeURIComponent(problemUrl)
+        + '&hashtags=' + encodeURIComponent('麻雀,受け入れ枚数練習');
+    window.open(intent, '_blank', 'noopener');
 }
