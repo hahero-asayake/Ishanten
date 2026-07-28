@@ -327,6 +327,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // ブックマーク一覧モーダル（help-modalと同じ開閉パターン）
+    // SW更新過渡期の旧HTML+新JS混成では要素が無い＝ガードで初期化全体を止めない
+    const bookmarkListBtn = document.getElementById('bookmark-list-btn');
+    const bookmarkModal = document.getElementById('bookmark-modal');
+    const closeBookmarkModalBtn = document.getElementById('close-bookmark-modal-btn');
+    if (bookmarkListBtn && bookmarkModal && closeBookmarkModalBtn) {
+        bookmarkListBtn.addEventListener('click', () => {
+            const error = document.getElementById('bookmark-add-error');
+            if (error) error.textContent = '';
+            renderBookmarkList();
+            bookmarkModal.style.display = 'flex';
+        });
+        closeBookmarkModalBtn.addEventListener('click', () => {
+            bookmarkModal.style.display = 'none';
+        });
+        bookmarkModal.addEventListener('click', (e) => {
+            if (e.target === bookmarkModal) {
+                bookmarkModal.style.display = 'none';
+            }
+        });
+        const bookmarkAddBtn = document.getElementById('bookmark-add-btn');
+        const bookmarkAddInput = document.getElementById('bookmark-add-input');
+        if (bookmarkAddBtn && bookmarkAddInput) {
+            bookmarkAddBtn.addEventListener('click', registerBookmarkFromInput);
+            bookmarkAddInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.isComposing) registerBookmarkFromInput(); // IME変換確定のEnterでは発火させない
+            });
+        }
+    }
+
     // 設定のアコーディオン機能
     settingsToggleBtn.addEventListener('click', () => {
         const isHidden = settingsPanel.style.display === 'none';
@@ -349,8 +379,8 @@ document.addEventListener('DOMContentLoaded', function() {
         tabHand.classList.remove('active');
     });
 
-    // 初回問題生成
-    generateNewProblem();
+    // 初回問題生成（?q= 付きなら共有URLから復元）
+    if (!loadProblemFromQuery()) generateNewProblem();
     
     // 設定変更時に新しい問題を生成
     document.getElementById('shanten-select').addEventListener('change', generateNewProblem);
@@ -387,6 +417,8 @@ async function generateHandLoop(targetShanten, minUkeire, maxUkeire, isChinitsu)
 
 // 新しい問題を生成
 function generateNewProblem() {
+    // 全生成経路で共有URLのクエリを除去（表示中と別の問題のURLが残る事故防止）
+    history.replaceState(null, '', location.pathname);
     const loaderOverlay = document.getElementById('loader-overlay');
     generationCancelled = false;
     
@@ -582,6 +614,12 @@ function resetUI() {
 function disableButtons() {
     document.getElementById('submit-btn').disabled = true;
     document.getElementById('giveup-btn').disabled = true;
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('giveup-btn').style.display = 'none';
+    const shareBtn = document.getElementById('share-btn');
+    if (shareBtn) shareBtn.style.display = 'block'; // SW更新過渡期の旧HTML+新JS混成でも既存機能を壊さない
+    const bookmarkBtn = document.getElementById('bookmark-btn');
+    if (bookmarkBtn) { bookmarkBtn.style.display = 'block'; updateBookmarkBtn(); }
     const calcBtns = document.querySelectorAll('.calc-btn');
     calcBtns.forEach(btn => btn.disabled = true);
 }
@@ -590,6 +628,205 @@ function disableButtons() {
 function enableButtons() {
     document.getElementById('submit-btn').disabled = false;
     document.getElementById('giveup-btn').disabled = false;
+    document.getElementById('submit-btn').style.display = '';
+    document.getElementById('giveup-btn').style.display = '';
+    const shareBtn = document.getElementById('share-btn');
+    if (shareBtn) shareBtn.style.display = 'none'; // 同上
+    const bookmarkBtn = document.getElementById('bookmark-btn');
+    if (bookmarkBtn) bookmarkBtn.style.display = 'none';
     const calcBtns = document.querySelectorAll('.calc-btn');
     calcBtns.forEach(btn => btn.disabled = false);
+}
+
+// ===== 共有URL・Xシェア =====
+
+// 手牌13枚(牌文字列配列) → mpsz文字列（正準形＝インデックス昇順・スート順 m→p→s→z）
+function encodeHand(hand) {
+    const idx = hand.map(tileToIndex).sort((a, b) => a - b);
+    const suitOf = i => i < 9 ? 'm' : i < 18 ? 'p' : i < 27 ? 's' : 'z';
+    const numOf  = i => i < 27 ? (i % 9) + 1 : i - 26;
+    let out = '', cur = '', lastSuit = null;
+    idx.forEach(i => {
+        const s = suitOf(i);
+        if (lastSuit !== null && s !== lastSuit) { out += cur + lastSuit; cur = ''; }
+        cur += numOf(i);
+        lastSuit = s;
+    });
+    if (lastSuit !== null) out += cur + lastSuit;
+    return out;
+}
+
+// mpsz文字列 → 手牌13枚(牌文字列配列)。不正なら null
+function decodeHand(q) {
+    if (typeof q !== 'string' || q.length === 0 || q.length > 30) return null;
+    if (!/^[1-9mpsz]+$/.test(q)) return null;
+    const tiles = [];
+    let digits = [];
+    for (const ch of q) {
+        if (ch >= '1' && ch <= '9') { digits.push(parseInt(ch)); continue; }
+        if (digits.length === 0) return null;          // スート文字の前に数字がない
+        for (const n of digits) {
+            if (ch === 'z') {
+                if (n > 7) return null;                 // 8z,9zは存在しない
+                tiles.push(indexToTile(27 + n - 1));
+            } else {
+                const base = ch === 'm' ? 0 : ch === 'p' ? 9 : 18;
+                tiles.push(indexToTile(base + n - 1));
+            }
+        }
+        digits = [];
+    }
+    if (digits.length !== 0) return null;               // 末尾にスートなしの数字
+    if (tiles.length !== 13) return null;               // 13枚ちょうどのみ
+    if (handToArray(tiles).some(c => c > 4)) return null; // 同一牌5枚以上
+    return tiles;
+}
+
+// クエリから問題を復元。復元したら true
+function loadProblemFromQuery() {
+    const q = new URLSearchParams(location.search).get('q');
+    if (!q) return false;
+    const tiles = decodeHand(q);
+    if (!tiles) {
+        console.warn('不正な共有クエリのためランダム生成にフォールバックします');
+        history.replaceState(null, '', location.pathname); // 不正クエリは除去
+        return false;
+    }
+    tiles.sort((a, b) => tileToIndex(a) - tileToIndex(b)); // 理牌
+    currentHand = tiles;
+    currentUkeire = calculateUkeire(handToArray(tiles));
+    currentAnswer = Object.values(currentUkeire).reduce((s, c) => s + c, 0);
+    displayHand(currentHand);
+    resetUI();
+    gameState = 'playing';
+    return true;
+}
+
+// 手牌 → Unicode麻雀牌絵文字（並びは正準形。字牌はmpsz数字順とUnicode順がズレるため対応表で変換）
+function handToEmoji(hand) {
+    const HONOR_CP = [0x1F000, 0x1F001, 0x1F002, 0x1F003, 0x1F006, 0x1F005, 0x1F004]; // 東南西北白發中
+    return hand.map(tileToIndex).sort((a, b) => a - b).map(i => {
+        let cp;
+        if (i < 9) cp = 0x1F007 + i;              // 萬子 🀇〜
+        else if (i < 18) cp = 0x1F019 + (i - 9);  // 筒子 🀙〜
+        else if (i < 27) cp = 0x1F010 + (i - 18); // 索子 🀐〜
+        else cp = HONOR_CP[i - 27];
+        // 🀄(中)だけ既定がカラー絵文字のため VS15(U+FE0E) でモノクロ字形に統一（2026-07-28 オーナー指定）
+        return String.fromCodePoint(cp) + (cp === 0x1F004 ? '\uFE0E' : '');
+    }).join('');
+}
+
+// Xでシェア（URLは必ず問題画面＝?q= のみ。答えは文面に含めない）
+// 改行位置を完全制御するため url/hashtags パラメータは使わず text に4行で集約（2026-07-28 オーナー指定）
+function shareToX() {
+    if (currentHand.length !== 13) return; // 生成完了前の空手牌ウィンドウで空URLを共有しない
+    const hand = encodeHand(currentHand);
+    const problemUrl = location.origin + location.pathname + '?q=' + hand;
+    const text = 'この手牌の受け入れ枚数は何枚？\n'
+        + handToEmoji(currentHand) + '\n'
+        + problemUrl + '\n'
+        + '#麻雀 #受け入れ枚数練習';
+    const intent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
+    window.open(intent, '_blank', 'noopener');
+}
+
+// ===== bookmark =====
+
+const BOOKMARK_KEY = 'ishanten.bookmarks.v1';
+
+// 読み書きとも throw しない（ストレージ遮断環境では黙って何もしない）
+function getBookmarks() {
+    try {
+        const v = JSON.parse(localStorage.getItem(BOOKMARK_KEY));
+        // 要素も検証（[null]等の汚染でも消費側がthrowしないように）
+        return Array.isArray(v) ? v.filter(b => b && typeof b.q === 'string') : [];
+    } catch { return []; }
+}
+function isBookmarked(q) { return getBookmarks().some(b => b.q === q); }
+function addBookmark(q) {
+    let list = getBookmarks().filter(b => b.q !== q);
+    list.unshift({ q, savedAt: Date.now() });
+    if (list.length > 50) list = list.slice(0, 50); // 上限50件・最古を落とす
+    try { localStorage.setItem(BOOKMARK_KEY, JSON.stringify(list)); }
+    catch { /* ストレージ不可環境では黙って諦める */ }
+}
+function removeBookmark(q) {
+    try {
+        localStorage.setItem(BOOKMARK_KEY,
+            JSON.stringify(getBookmarks().filter(b => b.q !== q)));
+    } catch { /* 同上 */ }
+}
+
+function updateBookmarkBtn() {
+    const btn = document.getElementById('bookmark-btn');
+    if (!btn) return; // SW更新過渡期の旧HTML+新JS混成でも壊さない
+    const saved = isBookmarked(encodeHand(currentHand));
+    btn.textContent = saved ? '🔖 保存済み' : '🔖 保存';
+    btn.classList.toggle('saved', saved);
+}
+function toggleBookmark() {
+    if (currentHand.length !== 13) return; // 生成完了前の空手牌ウィンドウで空エントリを作らない
+    const q = encodeHand(currentHand);
+    if (isBookmarked(q)) removeBookmark(q); else addBookmark(q);
+    updateBookmarkBtn();
+}
+
+// 手動登録（mpsz文字列 or 共有URLの貼り付け。正準形で保存）
+function registerBookmarkFromInput() {
+    const input = document.getElementById('bookmark-add-input');
+    const error = document.getElementById('bookmark-add-error');
+    if (!input) return;
+    let v = input.value.trim();
+    const m = v.match(/[?&]q=([1-9mpsz]+)/); // 共有URLなら ?q= を抽出
+    if (m) v = m[1];
+    const tiles = decodeHand(v);
+    if (!tiles) {
+        if (error) error.textContent = '形式が正しくありません（例: 123m456p78889s11z か 共有URL）';
+        return;
+    }
+    const q = encodeHand(tiles);
+    addBookmark(q);
+    if (!isBookmarked(q)) { // ストレージ不可環境（プライベートモード等）では成功に見せない
+        if (error) error.textContent = '保存できませんでした（ブラウザのストレージが利用できません）';
+        return;
+    }
+    input.value = '';
+    if (error) error.textContent = '';
+    renderBookmarkList();
+    updateBookmarkBtn(); // 現在の出題手牌を登録した場合、回答画面の保存ボタン表示も同期
+}
+
+// ヘッダー🔖モーダルの一覧描画
+function renderBookmarkList() {
+    const container = document.getElementById('bookmark-list');
+    container.innerHTML = '';
+    const list = getBookmarks();
+    let rendered = 0;
+    list.forEach(item => {
+        const tiles = decodeHand(item.q);
+        if (!tiles) return; // 壊れたエントリはスキップ
+        rendered++;
+        const row = document.createElement('div');
+        row.className = 'bookmark-item';
+        const tilesDiv = document.createElement('div');
+        tilesDiv.className = 'bm-tiles';
+        tiles.forEach(t => {
+            const img = document.createElement('img');
+            img.src = `pai-images/${getTileImageFilename(t)}`;
+            tilesDiv.appendChild(img);
+        });
+        const openBtn = document.createElement('button');
+        openBtn.textContent = '開く';
+        openBtn.className = 'bm-open';
+        openBtn.onclick = () => { location.href = location.pathname + '?q=' + item.q; };
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '削除';
+        delBtn.className = 'bm-del';
+        delBtn.onclick = () => { removeBookmark(item.q); renderBookmarkList(); updateBookmarkBtn(); };
+        row.append(tilesDiv, openBtn, delBtn);
+        container.appendChild(row);
+    });
+    if (rendered === 0) {
+        container.textContent = 'ブックマークはまだありません'; // 全件壊れエントリでも空白にしない
+    }
 }

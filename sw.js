@@ -1,27 +1,37 @@
-const CACHE_NAME = 'nanikiru-cache-v1';
-// キャッシュするファイルのリスト
+const CACHE_NAME = 'nanikiru-cache-v4';
+// キャッシュするファイルのリスト（?v= は index.html の参照と必ず一致させる）
 const urlsToCache = [
   '.',
   'index.html',
-  'style.css',
-  'script.js',
+  'style.css?v=4',
+  'script.js?v=4',
   'manifest.json'
   // 画像は動的にキャッシュするため、ここには含めない
 ];
 
 // インストールイベント
 self.addEventListener('install', event => {
+  self.skipWaiting(); // 新SWを待機なしで即時有効化
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        // cache:'reload' でブラウザHTTPキャッシュを迂回（CDNエッジ(max-age=600)は迂回不可＝push後10分の窓は運用で吸収）
+        return cache.addAll(urlsToCache.map(u => new Request(u, { cache: 'reload' })));
       })
   );
 });
 
 // フェッチイベント
 self.addEventListener('fetch', event => {
+  // ページ遷移（?q= 付き共有URL含む）はキャッシュ済み index.html を返す
+  // ※全requestへの ignoreSearch は禁止（style.css?v=4 が旧 style.css にマッチしてバスト無効化するため）
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      caches.match('./index.html').then(r => r || fetch(event.request))
+    );
+    return;
+  }
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -66,6 +76,6 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim()) // 開いている既存タブも新SWの管理下へ
   );
 });
