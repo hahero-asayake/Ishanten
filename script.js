@@ -328,21 +328,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ブックマーク一覧モーダル（help-modalと同じ開閉パターン）
+    // SW更新過渡期の旧HTML+新JS混成では要素が無い＝ガードで初期化全体を止めない
     const bookmarkListBtn = document.getElementById('bookmark-list-btn');
     const bookmarkModal = document.getElementById('bookmark-modal');
     const closeBookmarkModalBtn = document.getElementById('close-bookmark-modal-btn');
-    bookmarkListBtn.addEventListener('click', () => {
-        renderBookmarkList();
-        bookmarkModal.style.display = 'flex';
-    });
-    closeBookmarkModalBtn.addEventListener('click', () => {
-        bookmarkModal.style.display = 'none';
-    });
-    bookmarkModal.addEventListener('click', (e) => {
-        if (e.target === bookmarkModal) {
+    if (bookmarkListBtn && bookmarkModal && closeBookmarkModalBtn) {
+        bookmarkListBtn.addEventListener('click', () => {
+            renderBookmarkList();
+            bookmarkModal.style.display = 'flex';
+        });
+        closeBookmarkModalBtn.addEventListener('click', () => {
             bookmarkModal.style.display = 'none';
-        }
-    });
+        });
+        bookmarkModal.addEventListener('click', (e) => {
+            if (e.target === bookmarkModal) {
+                bookmarkModal.style.display = 'none';
+            }
+        });
+    }
 
     // 設定のアコーディオン機能
     settingsToggleBtn.addEventListener('click', () => {
@@ -705,6 +708,7 @@ function handToEmoji(hand) {
 // Xでシェア（URLは必ず問題画面＝?q= のみ。答えは文面に含めない）
 // 改行位置を完全制御するため url/hashtags パラメータは使わず text に4行で集約（2026-07-28 オーナー指定）
 function shareToX() {
+    if (currentHand.length !== 13) return; // 生成完了前の空手牌ウィンドウで空URLを共有しない
     const hand = encodeHand(currentHand);
     const problemUrl = location.origin + location.pathname + '?q=' + hand;
     const text = 'この手牌の受け入れ枚数は何枚？\n'
@@ -723,7 +727,8 @@ const BOOKMARK_KEY = 'ishanten.bookmarks.v1';
 function getBookmarks() {
     try {
         const v = JSON.parse(localStorage.getItem(BOOKMARK_KEY));
-        return Array.isArray(v) ? v : [];
+        // 要素も検証（[null]等の汚染でも消費側がthrowしないように）
+        return Array.isArray(v) ? v.filter(b => b && typeof b.q === 'string') : [];
     } catch { return []; }
 }
 function isBookmarked(q) { return getBookmarks().some(b => b.q === q); }
@@ -749,6 +754,7 @@ function updateBookmarkBtn() {
     btn.classList.toggle('saved', saved);
 }
 function toggleBookmark() {
+    if (currentHand.length !== 13) return; // 生成完了前の空手牌ウィンドウで空エントリを作らない
     const q = encodeHand(currentHand);
     if (isBookmarked(q)) removeBookmark(q); else addBookmark(q);
     updateBookmarkBtn();
@@ -759,13 +765,11 @@ function renderBookmarkList() {
     const container = document.getElementById('bookmark-list');
     container.innerHTML = '';
     const list = getBookmarks();
-    if (list.length === 0) {
-        container.textContent = 'ブックマークはまだありません';
-        return;
-    }
+    let rendered = 0;
     list.forEach(item => {
         const tiles = decodeHand(item.q);
         if (!tiles) return; // 壊れたエントリはスキップ
+        rendered++;
         const row = document.createElement('div');
         row.className = 'bookmark-item';
         const tilesDiv = document.createElement('div');
@@ -784,4 +788,7 @@ function renderBookmarkList() {
         row.append(tilesDiv, openBtn, delBtn);
         container.appendChild(row);
     });
+    if (rendered === 0) {
+        container.textContent = 'ブックマークはまだありません'; // 全件壊れエントリでも空白にしない
+    }
 }
