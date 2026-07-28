@@ -356,14 +356,47 @@ h1 {
 }
 
 .action-btn.bookmark {
-    background: #6c757d;
+    background: #fd7e14;
     color: white;
 }
 
 .action-btn.bookmark.saved {
     background: white;
-    color: #6c757d;
-    border: 2px solid #6c757d;
+    color: #fd7e14;
+    border: 2px solid #fd7e14;
+}
+
+.bookmark-add {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.bookmark-add input {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.bookmark-add button {
+    flex-shrink: 0;
+    background: #fd7e14;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.bookmark-add-error {
+    color: #dc3545;
+    font-size: 0.8rem;
+    margin: 0 0 8px;
+    min-height: 1em;
 }
 
 .bookmark-item {
@@ -388,6 +421,23 @@ h1 {
 
 .bookmark-item button {
     flex-shrink: 0;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.bookmark-item .bm-open {
+    background: #667eea;
+    color: white;
+}
+
+.bookmark-item .bm-del {
+    background: none;
+    border: 1px solid #ccc;
+    color: #888;
 }
 
 .ukeire-tile-wrapper {

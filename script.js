@@ -334,6 +334,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeBookmarkModalBtn = document.getElementById('close-bookmark-modal-btn');
     if (bookmarkListBtn && bookmarkModal && closeBookmarkModalBtn) {
         bookmarkListBtn.addEventListener('click', () => {
+            const error = document.getElementById('bookmark-add-error');
+            if (error) error.textContent = '';
             renderBookmarkList();
             bookmarkModal.style.display = 'flex';
         });
@@ -345,6 +347,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 bookmarkModal.style.display = 'none';
             }
         });
+        const bookmarkAddBtn = document.getElementById('bookmark-add-btn');
+        const bookmarkAddInput = document.getElementById('bookmark-add-input');
+        if (bookmarkAddBtn && bookmarkAddInput) {
+            bookmarkAddBtn.addEventListener('click', registerBookmarkFromInput);
+            bookmarkAddInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') registerBookmarkFromInput();
+            });
+        }
     }
 
     // 設定のアコーディオン機能
@@ -701,7 +711,8 @@ function handToEmoji(hand) {
         else if (i < 18) cp = 0x1F019 + (i - 9);  // 筒子 🀙〜
         else if (i < 27) cp = 0x1F010 + (i - 18); // 索子 🀐〜
         else cp = HONOR_CP[i - 27];
-        return String.fromCodePoint(cp);
+        // 🀄(中)だけ既定がカラー絵文字のため VS15(U+FE0E) でモノクロ字形に統一（2026-07-28 オーナー指定）
+        return String.fromCodePoint(cp) + (cp === 0x1F004 ? '\uFE0E' : '');
     }).join('');
 }
 
@@ -760,6 +771,25 @@ function toggleBookmark() {
     updateBookmarkBtn();
 }
 
+// 手動登録（mpsz文字列 or 共有URLの貼り付け。正準形で保存）
+function registerBookmarkFromInput() {
+    const input = document.getElementById('bookmark-add-input');
+    const error = document.getElementById('bookmark-add-error');
+    if (!input) return;
+    let v = input.value.trim();
+    const m = v.match(/[?&]q=([1-9mpsz]+)/); // 共有URLなら ?q= を抽出
+    if (m) v = m[1];
+    const tiles = decodeHand(v);
+    if (!tiles) {
+        if (error) error.textContent = '形式が正しくありません（例: 123m456p78889s11z か 共有URL）';
+        return;
+    }
+    addBookmark(encodeHand(tiles));
+    input.value = '';
+    if (error) error.textContent = '';
+    renderBookmarkList();
+}
+
 // ヘッダー🔖モーダルの一覧描画
 function renderBookmarkList() {
     const container = document.getElementById('bookmark-list');
@@ -781,9 +811,11 @@ function renderBookmarkList() {
         });
         const openBtn = document.createElement('button');
         openBtn.textContent = '開く';
+        openBtn.className = 'bm-open';
         openBtn.onclick = () => { location.href = location.pathname + '?q=' + item.q; };
         const delBtn = document.createElement('button');
         delBtn.textContent = '削除';
+        delBtn.className = 'bm-del';
         delBtn.onclick = () => { removeBookmark(item.q); renderBookmarkList(); };
         row.append(tilesDiv, openBtn, delBtn);
         container.appendChild(row);
