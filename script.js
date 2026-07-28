@@ -682,13 +682,14 @@ function handToEmoji(hand) {
 }
 
 // Xでシェア（URLは必ず問題画面＝?q= のみ。答えは文面に含めない）
+// 改行位置を完全制御するため url/hashtags パラメータは使わず text に4行で集約（2026-07-28 オーナー指定）
 function shareToX() {
     const hand = encodeHand(currentHand);
     const problemUrl = location.origin + location.pathname + '?q=' + hand;
-    const text = 'この手牌の受け入れ枚数、何枚かわかる？\n' + handToEmoji(currentHand);
-    const intent = 'https://twitter.com/intent/tweet'
-        + '?text=' + encodeURIComponent(text)
-        + '&url=' + encodeURIComponent(problemUrl)
-        + '&hashtags=' + encodeURIComponent('麻雀,受け入れ枚数練習');
+    const text = 'この手牌の受け入れ枚数は何枚？\n'
+        + handToEmoji(currentHand) + '\n'
+        + problemUrl + '\n'
+        + '#麻雀 #受け入れ枚数練習';
+    const intent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
     window.open(intent, '_blank', 'noopener');
 }
