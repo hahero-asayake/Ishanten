@@ -327,6 +327,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // ブックマーク一覧モーダル（help-modalと同じ開閉パターン）
+    const bookmarkListBtn = document.getElementById('bookmark-list-btn');
+    const bookmarkModal = document.getElementById('bookmark-modal');
+    const closeBookmarkModalBtn = document.getElementById('close-bookmark-modal-btn');
+    bookmarkListBtn.addEventListener('click', () => {
+        renderBookmarkList();
+        bookmarkModal.style.display = 'flex';
+    });
+    closeBookmarkModalBtn.addEventListener('click', () => {
+        bookmarkModal.style.display = 'none';
+    });
+    bookmarkModal.addEventListener('click', (e) => {
+        if (e.target === bookmarkModal) {
+            bookmarkModal.style.display = 'none';
+        }
+    });
+
     // 設定のアコーディオン機能
     settingsToggleBtn.addEventListener('click', () => {
         const isHidden = settingsPanel.style.display === 'none';
@@ -588,6 +605,8 @@ function disableButtons() {
     document.getElementById('giveup-btn').style.display = 'none';
     const shareBtn = document.getElementById('share-btn');
     if (shareBtn) shareBtn.style.display = 'block'; // SW更新過渡期の旧HTML+新JS混成でも既存機能を壊さない
+    const bookmarkBtn = document.getElementById('bookmark-btn');
+    if (bookmarkBtn) { bookmarkBtn.style.display = 'block'; updateBookmarkBtn(); }
     const calcBtns = document.querySelectorAll('.calc-btn');
     calcBtns.forEach(btn => btn.disabled = true);
 }
@@ -600,6 +619,8 @@ function enableButtons() {
     document.getElementById('giveup-btn').style.display = '';
     const shareBtn = document.getElementById('share-btn');
     if (shareBtn) shareBtn.style.display = 'none'; // 同上
+    const bookmarkBtn = document.getElementById('bookmark-btn');
+    if (bookmarkBtn) bookmarkBtn.style.display = 'none';
     const calcBtns = document.querySelectorAll('.calc-btn');
     calcBtns.forEach(btn => btn.disabled = false);
 }
@@ -692,4 +713,75 @@ function shareToX() {
         + '#麻雀 #受け入れ枚数練習';
     const intent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
     window.open(intent, '_blank', 'noopener');
+}
+
+// ===== bookmark =====
+
+const BOOKMARK_KEY = 'ishanten.bookmarks.v1';
+
+// 読み書きとも throw しない（ストレージ遮断環境では黙って何もしない）
+function getBookmarks() {
+    try {
+        const v = JSON.parse(localStorage.getItem(BOOKMARK_KEY));
+        return Array.isArray(v) ? v : [];
+    } catch { return []; }
+}
+function isBookmarked(q) { return getBookmarks().some(b => b.q === q); }
+function addBookmark(q) {
+    let list = getBookmarks().filter(b => b.q !== q);
+    list.unshift({ q, savedAt: Date.now() });
+    if (list.length > 50) list = list.slice(0, 50); // 上限50件・最古を落とす
+    try { localStorage.setItem(BOOKMARK_KEY, JSON.stringify(list)); }
+    catch { /* ストレージ不可環境では黙って諦める */ }
+}
+function removeBookmark(q) {
+    try {
+        localStorage.setItem(BOOKMARK_KEY,
+            JSON.stringify(getBookmarks().filter(b => b.q !== q)));
+    } catch { /* 同上 */ }
+}
+
+function updateBookmarkBtn() {
+    const btn = document.getElementById('bookmark-btn');
+    if (!btn) return; // SW更新過渡期の旧HTML+新JS混成でも壊さない
+    const saved = isBookmarked(encodeHand(currentHand));
+    btn.textContent = saved ? '🔖 保存済み' : '🔖 保存';
+    btn.classList.toggle('saved', saved);
+}
+function toggleBookmark() {
+    const q = encodeHand(currentHand);
+    if (isBookmarked(q)) removeBookmark(q); else addBookmark(q);
+    updateBookmarkBtn();
+}
+
+// ヘッダー🔖モーダルの一覧描画
+function renderBookmarkList() {
+    const container = document.getElementById('bookmark-list');
+    container.innerHTML = '';
+    const list = getBookmarks();
+    if (list.length === 0) {
+        container.textContent = 'ブックマークはまだありません';
+        return;
+    }
+    list.forEach(item => {
+        const tiles = decodeHand(item.q);
+        if (!tiles) return; // 壊れたエントリはスキップ
+        const row = document.createElement('div');
+        row.className = 'bookmark-item';
+        const tilesDiv = document.createElement('div');
+        tilesDiv.className = 'bm-tiles';
+        tiles.forEach(t => {
+            const img = document.createElement('img');
+            img.src = `pai-images/${getTileImageFilename(t)}`;
+            tilesDiv.appendChild(img);
+        });
+        const openBtn = document.createElement('button');
+        openBtn.textContent = '開く';
+        openBtn.onclick = () => { location.href = location.pathname + '?q=' + item.q; };
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '削除';
+        delBtn.onclick = () => { removeBookmark(item.q); renderBookmarkList(); };
+        row.append(tilesDiv, openBtn, delBtn);
+        container.appendChild(row);
+    });
 }

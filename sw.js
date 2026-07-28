@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nanikiru-cache-v2';
+const CACHE_NAME = 'nanikiru-cache-v3';
 // キャッシュするファイルのリスト
 const urlsToCache = [
   '.',

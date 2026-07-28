@@ -66,6 +66,26 @@ h1 {
     padding-bottom: 2px; /* 微調整 */
 }
 
+.bookmark-list-button {
+    background: none;
+    border: 2px solid white;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 2px; /* 微調整 */
+}
+
 .settings-wrapper {
     padding: 0 15px;
     background: #f1f3f5;
@@ -333,6 +353,41 @@ h1 {
 .action-btn.share {
     background: #0f1419;
     color: white;
+}
+
+.action-btn.bookmark {
+    background: #6c757d;
+    color: white;
+}
+
+.action-btn.bookmark.saved {
+    background: white;
+    color: #6c757d;
+    border: 2px solid #6c757d;
+}
+
+.bookmark-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.bookmark-item .bm-tiles {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    overflow-x: auto;
+}
+
+.bookmark-item .bm-tiles img {
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.bookmark-item button {
+    flex-shrink: 0;
 }
 
 .ukeire-tile-wrapper {
