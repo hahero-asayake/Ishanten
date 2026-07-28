@@ -1,10 +1,10 @@
-const CACHE_NAME = 'nanikiru-cache-v3';
-// キャッシュするファイルのリスト
+const CACHE_NAME = 'nanikiru-cache-v4';
+// キャッシュするファイルのリスト（?v= は index.html の参照と必ず一致させる）
 const urlsToCache = [
   '.',
   'index.html',
-  'style.css',
-  'script.js',
+  'style.css?v=4',
+  'script.js?v=4',
   'manifest.json'
   // 画像は動的にキャッシュするため、ここには含めない
 ];
@@ -24,6 +24,14 @@ self.addEventListener('install', event => {
 
 // フェッチイベント
 self.addEventListener('fetch', event => {
+  // ページ遷移（?q= 付き共有URL含む）はキャッシュ済み index.html を返す
+  // ※全requestへの ignoreSearch は禁止（style.css?v=4 が旧 style.css にマッチしてバスト無効化するため）
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      caches.match('./index.html').then(r => r || fetch(event.request))
+    );
+    return;
+  }
   event.respondWith(
     caches.match(event.request)
       .then(response => {
