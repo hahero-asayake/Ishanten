@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (bookmarkAddBtn && bookmarkAddInput) {
             bookmarkAddBtn.addEventListener('click', registerBookmarkFromInput);
             bookmarkAddInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') registerBookmarkFromInput();
+                if (e.key === 'Enter' && !e.isComposing) registerBookmarkFromInput(); // IME変換確定のEnterでは発火させない
             });
         }
     }
@@ -784,10 +784,16 @@ function registerBookmarkFromInput() {
         if (error) error.textContent = '形式が正しくありません（例: 123m456p78889s11z か 共有URL）';
         return;
     }
-    addBookmark(encodeHand(tiles));
+    const q = encodeHand(tiles);
+    addBookmark(q);
+    if (!isBookmarked(q)) { // ストレージ不可環境（プライベートモード等）では成功に見せない
+        if (error) error.textContent = '保存できませんでした（ブラウザのストレージが利用できません）';
+        return;
+    }
     input.value = '';
     if (error) error.textContent = '';
     renderBookmarkList();
+    updateBookmarkBtn(); // 現在の出題手牌を登録した場合、回答画面の保存ボタン表示も同期
 }
 
 // ヘッダー🔖モーダルの一覧描画
@@ -816,7 +822,7 @@ function renderBookmarkList() {
         const delBtn = document.createElement('button');
         delBtn.textContent = '削除';
         delBtn.className = 'bm-del';
-        delBtn.onclick = () => { removeBookmark(item.q); renderBookmarkList(); };
+        delBtn.onclick = () => { removeBookmark(item.q); renderBookmarkList(); updateBookmarkBtn(); };
         row.append(tilesDiv, openBtn, delBtn);
         container.appendChild(row);
     });
