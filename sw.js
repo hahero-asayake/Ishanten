@@ -16,7 +16,7 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Opened cache');
-        // cache:'reload' でブラウザHTTPキャッシュを迂回し、CDN更新窓での新旧混成の焼き込みを防ぐ
+        // cache:'reload' でブラウザHTTPキャッシュを迂回（CDNエッジ(max-age=600)は迂回不可＝push後10分の窓は運用で吸収）
         return cache.addAll(urlsToCache.map(u => new Request(u, { cache: 'reload' })));
       })
   );
