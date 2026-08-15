@@ -15,6 +15,19 @@ const SCRIPT_BASE = (() => {
     return src ? src.slice(0, src.lastIndexOf('/') + 1) : '';
 })();
 
+// 初回アクセス時に？モーダルを自動で開く機能用のフラグ。キーは言語別(<html lang>基準)にする＝
+// 同一オリジンでlocalStorageは共有されるため、共通キーだと日本語版既読の人が英語版に来た時に開かなくなってしまう。
+const HELP_SEEN_KEY = 'ishanten_help_seen_' + (document.documentElement.lang || 'ja');
+// 読み書きとも throw しない（ブックマーク機能と同じガード。ストレージ不可環境では既読扱いにして自動オープンを諦める）
+function hasSeenHelp() {
+    try { return localStorage.getItem(HELP_SEEN_KEY) === '1'; }
+    catch { return true; }
+}
+function markHelpSeen() {
+    try { localStorage.setItem(HELP_SEEN_KEY, '1'); }
+    catch { /* ストレージ不可環境では黙って諦める */ }
+}
+
 // 麻雀牌の定義
 const TILES = {
   man: ['1m','2m','3m','4m','5m','6m','7m','8m','9m'], // 萬子
@@ -343,6 +356,13 @@ document.addEventListener('DOMContentLoaded', function() {
             helpModal.style.display = 'none';
         }
     });
+
+    // 初回アクセス時に？モーダルを自動で開く（言語別ページごとに1回だけ）。
+    // 共有URL(?q=)付きアクセスは問題を解きに来た人なのでモーダルを被せない＝フラグも立てず、次の通常アクセスで1回出す。
+    if (!new URLSearchParams(location.search).has('q') && !hasSeenHelp()) {
+        helpModal.style.display = 'flex';
+        markHelpSeen();
+    }
 
     // ブックマーク一覧モーダル（help-modalと同じ開閉パターン）
     // SW更新過渡期の旧HTML+新JS混成では要素が無い＝ガードで初期化全体を止めない
