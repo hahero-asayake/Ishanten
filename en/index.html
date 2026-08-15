@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mahjong Ukeire Trainer - Tile Efficiency Practice</title>
+    <link rel="icon" href="../favicon.png" type="image/png">
+    <link rel="canonical" href="https://asayake.org/Ishanten/en/">
+    <link rel="alternate" hreflang="ja" href="https://asayake.org/Ishanten/">
+    <link rel="alternate" hreflang="en" href="https://asayake.org/Ishanten/en/">
+    <link rel="alternate" hreflang="zh-Hant" href="https://asayake.org/Ishanten/zh-Hant/">
+    <link rel="alternate" hreflang="zh-Hans" href="https://asayake.org/Ishanten/zh-Hans/">
+    <link rel="alternate" hreflang="x-default" href="https://asayake.org/Ishanten/">
+    <meta name="description" content="A free training app to practice calculating ukeire (tile acceptance) in riichi mahjong. Solve problems across different shanten levels and conditions to build your tile efficiency and discard-decision skills.">
+    <meta name="keywords" content="mahjong, ukeire, tile efficiency, shanten, riichi mahjong, training, practice, app, chinitsu">
+    <!-- OGP -->
+    <meta property="og:title" content="Mahjong Ukeire Trainer - Tile Efficiency Practice">
+    <meta property="og:description" content="A free training app to practice calculating ukeire (tile acceptance) in riichi mahjong. Solve problems across different shanten levels and conditions to build your tile efficiency and discard-decision skills.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://asayake.org/Ishanten/en/">
+    <meta property="og:image" content="https://asayake.org/Ishanten/pai-images/ogp_image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Icon image for the Mahjong Ukeire Trainer app">
+    <meta property="og:site_name" content="Mahjong Ukeire Trainer">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://asayake.org/Ishanten/pai-images/ogp_image.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Mahjong Ukeire Trainer",
+      "url": "https://asayake.org/Ishanten/en/",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "en",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+      "description": "A free training app to practice calculating ukeire in riichi mahjong. Build your foundation in tile efficiency and discard decisions.",
+      "author": { "@type": "Person", "name": "hahero", "url": "https://asayake.org/" }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is ukeire (tile acceptance)?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It's the total number of remaining tiles, across all useful tile types, that would advance your current hand's shanten by one step. A higher ukeire means your hand can progress more easily, and it's the most basic measure of tile efficiency." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is shanten?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It's a number showing how many more tile exchanges are needed to reach tenpai (a ready hand). 0 means tenpai, and higher numbers mean the hand is further from tenpai." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is Full Flush (chinitsu) mode?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A practice mode where the hand is restricted to a single suit — characters, circles, or bamboo. Judging ukeire becomes harder, making it suited for advanced players." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it free? Do I need to register?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It's completely free with no registration required. You can start practicing right away in your browser." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use it on a smartphone?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. It supports PWA (Progressive Web App), so you can add it to your home screen and launch it like a native app, even offline." }
+        },
+        {
+          "@type": "Question",
+          "name": "How is this different from a \"what to discard\" (nanikiru) problem?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A nanikiru problem asks which tile to discard, while this app asks you to answer the exact ukeire count of the current hand as a number. It directly trains the ability to count ukeire accurately — the foundation that discard decisions are built on." }
+        }
+      ]
+    }
+    </script>
+
+    <link rel="stylesheet" href="../style.css?v=6" />
+    <link rel="manifest" href="../manifest.json" />
+    <meta name="theme-color" content="#667eea" />
+    <!-- Google AdSense -->
+    <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7058313793336590"
+        crossorigin="anonymous"
+    ></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BE6C28P61K"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag("js", new Date());
+
+        gtag("config", "G-BE6C28P61K");
+    </script>
+
+    <!-- UI文言辞書。このインライン定義が正本(ビルド無し構成のためJSON等の別ファイルでは管理しない。script.js読み込み前に注入)。？モーダルの本文は下の静的HTMLに直接記述＝AIクローラ対応 -->
+    <script>
+        window.ISHANTEN_I18N = {
+  "meta": {
+    "title": "Mahjong Ukeire Trainer - Tile Efficiency Practice",
+    "description": "A free training app to practice calculating ukeire (tile acceptance) in riichi mahjong. Solve problems across different shanten levels and conditions to build your tile efficiency and discard-decision skills.",
+    "keywords": "mahjong, ukeire, tile efficiency, shanten, riichi mahjong, training, practice, app, chinitsu",
+    "ogSiteName": "Mahjong Ukeire Trainer",
+    "ogImageAlt": "Icon image for the Mahjong Ukeire Trainer app",
+    "jsonldAppName": "Mahjong Ukeire Trainer",
+    "jsonldAppDescription": "A free training app to practice calculating ukeire in riichi mahjong. Build your foundation in tile efficiency and discard decisions."
+  },
+  "faq": [
+    {
+      "q": "What is ukeire (tile acceptance)?",
+      "a": "It's the total number of remaining tiles, across all useful tile types, that would advance your current hand's shanten by one step. A higher ukeire means your hand can progress more easily, and it's the most basic measure of tile efficiency."
+    },
+    {
+      "q": "What is shanten?",
+      "a": "It's a number showing how many more tile exchanges are needed to reach tenpai (a ready hand). 0 means tenpai, and higher numbers mean the hand is further from tenpai."
+    },
+    {
+      "q": "What is Full Flush (chinitsu) mode?",
+      "a": "A practice mode where the hand is restricted to a single suit — characters, circles, or bamboo. Judging ukeire becomes harder, making it suited for advanced players."
+    },
+    {
+      "q": "Is it free? Do I need to register?",
+      "a": "It's completely free with no registration required. You can start practicing right away in your browser."
+    },
+    {
+      "q": "Can I use it on a smartphone?",
+      "a": "Yes. It supports PWA (Progressive Web App), so you can add it to your home screen and launch it like a native app, even offline."
+    },
+    {
+      "q": "How is this different from a \"what to discard\" (nanikiru) problem?",
+      "a": "A nanikiru problem asks which tile to discard, while this app asks you to answer the exact ukeire count of the current hand as a number. It directly trains the ability to count ukeire accurately — the foundation that discard decisions are built on."
+    }
+  ],
+  "ui": {
+    "pageTitle": "Mahjong 🀄 Ukeire Trainer",
+    "loaderGenerating": "Generating hand...",
+    "cancelGeneration": "Cancel",
+    "settingsToggleOpen": "Settings ▼",
+    "settingsToggleClose": "Settings ▲",
+    "shantenLabel": "Shanten:",
+    "shantenOptions": {
+      "tenpai": "Tenpai",
+      "shanten1": "1-shanten",
+      "shanten2": "2-shanten",
+      "shanten3": "3-shanten"
+    },
+    "ukeireLabel": "Ukeire range:",
+    "chinitsuLabel": "Full Flush mode:",
+    "tabHand": "Hand",
+    "tabUkeire": "Ukeire",
+    "questionInitial": "How many tiles are ukeire for this hand?",
+    "submitBtn": "Answer",
+    "giveupBtn": "Give up",
+    "shareBtn": "Share on X",
+    "bookmarkSaveBtn": "🔖 Save",
+    "bookmarkSavedBtn": "🔖 Saved",
+    "nextBtn": "Next",
+    "msgCorrect": "Correct!",
+    "msgIncorrect": "Incorrect. Try again.",
+    "msgAnswerReveal": "The answer was {n} tiles.",
+    "bookmarkModalTitle": "Bookmarks",
+    "bookmarkAddPlaceholder": "Shared URL or 123m456p78889s11z format",
+    "bookmarkAddBtn": "Add",
+    "bookmarkOpenBtn": "Open",
+    "bookmarkDeleteBtn": "Delete",
+    "bookmarkEmptyMessage": "No bookmarks yet",
+    "bookmarkInvalidFormat": "Invalid format (e.g. 123m456p78889s11z or a shared URL)",
+    "bookmarkSaveFailed": "Couldn't save (browser storage is unavailable)"
+  },
+  "help": {
+    "aboutHeading": "About this app",
+    "aboutBody": "\"Mahjong Ukeire Trainer\" is a free browser-based training app for building tile efficiency (the underlying skill behind nanikiru/discard decisions). It randomly generates hands within your chosen shanten and ukeire range, and you answer the actual ukeire count as a number — repeated practice that sharpens your tile-efficiency judgment. No registration, completely free. Add it to your smartphone's home screen to use it like a native app (PWA support).",
+    "howToHeading": "How to use",
+    "steps": [
+      "Open \"Settings ▼\" at the top of the screen and set the <strong>shanten level</strong>, <strong>ukeire range</strong>, and <strong>Full Flush mode</strong> you want to practice.",
+      "Once you're done, a problem matching your conditions is generated automatically.",
+      "Check the 13 tiles shown, then calculate the ukeire count needed to reach tenpai.",
+      "Enter the number you calculated using the calculator at the bottom of the screen.",
+      "Press the \"Answer\" button to check your result."
+    ],
+    "stepCorrectCase": "<strong>If correct</strong>: The \"Ukeire\" tab becomes active so you can check the accepting tiles. Press \"Next\" to move to a new problem.",
+    "stepIncorrectCase": "<strong>If incorrect</strong>: A message appears and you can try again.",
+    "stepGiveUp": "If you're not sure of the answer, press \"Give up\" to reveal the correct count and the list of accepting tiles.",
+    "glossaryHeading": "Glossary",
+    "glossary": [
+      {
+        "term": "What is ukeire?",
+        "desc": "The total number of remaining tiles, across all useful tile types, that would advance the current hand's shanten by one (bring it closer to tenpai). It's the most basic measure for tile efficiency and discard decisions."
+      },
+      {
+        "term": "What is shanten?",
+        "desc": "A number showing how many more draws/exchanges are needed to reach tenpai. 0 = tenpai, 1 = 1-shanten, 2 = 2-shanten, 3 = 3-shanten. Known in English simply as shanten."
+      },
+      {
+        "term": "What is tile efficiency?",
+        "desc": "The approach of choosing discards that keep your hand's ukeire count as high as possible. It's the foundational skill behind nanikiru (discard) problems."
+      },
+      {
+        "term": "What is Full Flush (chinitsu) mode?",
+        "desc": "A restriction where the hand is built from only one suit — characters, circles, or bamboo. Counting ukeire becomes more complex, making it suited for advanced practice."
+      }
+    ],
+    "faqHeading": "FAQ",
+    "creditsDeveloper": "Developer: @AsayakeHahero",
+    "creditsImage": "Tile images by: Majandofu"
+  },
+  "share": {
+    "text": "How many tiles are ukeire for this hand?",
+    "hashtags": "#mahjong #ukeire #tileefficiency"
+  },
+  "langNames": {
+    "ja": "日本語",
+    "en": "English",
+    "zh-Hant": "繁體中文",
+    "zh-Hans": "简体中文"
+  }
+};
+    </script>
+</head>
+
+<body>
+    <div id="loader-overlay" class="loader-overlay" style="display: none;">
+        <div class="loader"></div>
+        <p>Generating hand...</p>
+        <button id="cancel-generation-btn" class="action-btn giveup">Cancel</button>
+    </div>
+
+    <div class="container">
+        <div class="title-container">
+            <button id="bookmark-list-btn" class="bookmark-list-button">🔖</button>
+            <h1>Mahjong 🀄 Ukeire Trainer</h1>
+            <button id="help-btn" class="help-button">？</button>
+        </div>
+
+        <div class="settings-wrapper">
+            <button id="settings-toggle-btn">Settings ▼</button>
+            <div id="settings-panel" class="settings" style="display: none;">
+                <div class="setting-item">
+                    <label for="shanten-select">Shanten:</label>
+                    <select id="shanten-select">
+                        <option value="0">Tenpai</option>
+                        <option value="1" selected>1-shanten</option>
+                        <option value="2">2-shanten</option>
+                        <option value="3">3-shanten</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <label for="min-ukeire">Ukeire range:</label>
+                    <div class="range-inputs">
+                        <input type="number" id="min-ukeire" value="1" min="1" />
+                        <span>～</span>
+                        <input type="number" id="max-ukeire" value="123" min="1" />
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label for="chinitsu-checkbox">Full Flush mode:</label>
+                    <div class="toggle-switch-container">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="chinitsu-checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="display-area">
+                <div class="display-tabs">
+                    <button id="tab-hand" class="tab-btn active">Hand</button>
+                    <button id="tab-ukeire" class="tab-btn" disabled>Ukeire</button>
+                </div>
+
+                <div id="hand-view" class="tab-content active">
+                    <div id="tiles-container" class="tiles-container">
+                        <!-- 牌が動的に表示されます -->
+                    </div>
+                </div>
+
+                <div id="ukeire-view" class="tab-content">
+                    <div id="ukeire-tiles" class="tiles-container"></div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="question-area">
+                    <h3 id="question-text">How many tiles are ukeire for this hand?</h3>
+
+                    <div class="calculator">
+                        <div id="display" class="display">0</div>
+                        <div class="button-grid">
+                            <button class="calc-btn number" onclick="appendNumber('1')">1</button>
+                            <button class="calc-btn number" onclick="appendNumber('2')">2</button>
+                            <button class="calc-btn number" onclick="appendNumber('3')">3</button>
+                            <button class="calc-btn number" onclick="appendNumber('4')">4</button>
+                            <button class="calc-btn number" onclick="appendNumber('5')">5</button>
+                            <button class="calc-btn number" onclick="appendNumber('6')">6</button>
+                            <button class="calc-btn number" onclick="appendNumber('7')">7</button>
+                            <button class="calc-btn number" onclick="appendNumber('8')">8</button>
+                            <button class="calc-btn number" onclick="appendNumber('9')">9</button>
+                            <button class="calc-btn clear" onclick="clearDisplay()">C</button>
+                            <button class="calc-btn number" onclick="appendNumber('0')">0</button>
+                            <button class="calc-btn" onclick="deleteLast()">⌫</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="submit-btn" class="action-btn submit" onclick="submitAnswer()">
+                        Answer
+                    </button>
+                    <button id="giveup-btn" class="action-btn giveup" onclick="giveUp()">Give up</button>
+                    <button id="share-btn" class="action-btn share" onclick="shareToX()" style="display: none;">Share on X</button>
+                    <button id="bookmark-btn" class="action-btn bookmark" onclick="toggleBookmark()" style="display: none;">🔖 Save</button>
+                    <button
+                        id="next-btn"
+                        class="action-btn next"
+                        onclick="nextProblem()"
+                        style="display: none;"
+                    >
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../script.js?v=6"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker
+                    .register("../sw.js")
+                    .then((registration) => {
+                        console.log(
+                            "ServiceWorker registration successful with scope: ",
+                            registration.scope
+                        );
+                    })
+                    .catch((err) => {
+                        console.log("ServiceWorker registration failed: ", err);
+                    });
+            });
+        }
+    </script>
+
+    <!-- 遊び方モーダル -->
+    <div id="help-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button id="close-modal-btn" class="close-button">&times;</button>
+
+            <section class="about-section" aria-labelledby="about-heading">
+                <h2 id="about-heading">About this app</h2>
+                <p>
+                    &quot;Mahjong Ukeire Trainer&quot; is a free browser-based training app for building tile efficiency (the underlying skill behind nanikiru/discard decisions). It randomly generates hands within your chosen shanten and ukeire range, and you answer the actual ukeire count as a number — repeated practice that sharpens your tile-efficiency judgment. No registration, completely free. Add it to your smartphone's home screen to use it like a native app (PWA support).
+                </p>
+
+                <h3>How to use</h3>
+                <ol>
+                    <li>Open "Settings ▼" at the top of the screen and set the <strong>shanten level</strong>, <strong>ukeire range</strong>, and <strong>Full Flush mode</strong> you want to practice.</li>
+                    <li>Once you're done, a problem matching your conditions is generated automatically.</li>
+                    <li>Check the 13 tiles shown, then calculate the ukeire count needed to reach tenpai.</li>
+                    <li>Enter the number you calculated using the calculator at the bottom of the screen.</li>
+                    <li>Press the "Answer" button to check your result.
+                        <ul>
+                            <li><strong>If correct</strong>: The "Ukeire" tab becomes active so you can check the accepting tiles. Press "Next" to move to a new problem.</li>
+                            <li><strong>If incorrect</strong>: A message appears and you can try again.</li>
+                        </ul>
+                    </li>
+                    <li>If you're not sure of the answer, press &quot;Give up&quot; to reveal the correct count and the list of accepting tiles.</li>
+                </ol>
+
+                <h3>Glossary</h3>
+                <dl class="glossary">
+                    <dt>What is ukeire?</dt>
+                    <dd>The total number of remaining tiles, across all useful tile types, that would advance the current hand's shanten by one (bring it closer to tenpai). It's the most basic measure for tile efficiency and discard decisions.</dd>
+
+                    <dt>What is shanten?</dt>
+                    <dd>A number showing how many more draws/exchanges are needed to reach tenpai. 0 = tenpai, 1 = 1-shanten, 2 = 2-shanten, 3 = 3-shanten. Known in English simply as shanten.</dd>
+
+                    <dt>What is tile efficiency?</dt>
+                    <dd>The approach of choosing discards that keep your hand's ukeire count as high as possible. It's the foundational skill behind nanikiru (discard) problems.</dd>
+
+                    <dt>What is Full Flush (chinitsu) mode?</dt>
+                    <dd>A restriction where the hand is built from only one suit — characters, circles, or bamboo. Counting ukeire becomes more complex, making it suited for advanced practice.</dd>
+                </dl>
+
+                <h3>FAQ</h3>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <h4>What is ukeire (tile acceptance)?</h4>
+                        <p>It's the total number of remaining tiles, across all useful tile types, that would advance your current hand's shanten by one step. A higher ukeire means your hand can progress more easily, and it's the most basic measure of tile efficiency.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>What is shanten?</h4>
+                        <p>It's a number showing how many more tile exchanges are needed to reach tenpai (a ready hand). 0 means tenpai, and higher numbers mean the hand is further from tenpai.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>What is Full Flush (chinitsu) mode?</h4>
+                        <p>A practice mode where the hand is restricted to a single suit — characters, circles, or bamboo. Judging ukeire becomes harder, making it suited for advanced players.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Is it free? Do I need to register?</h4>
+                        <p>It's completely free with no registration required. You can start practicing right away in your browser.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Can I use it on a smartphone?</h4>
+                        <p>Yes. It supports PWA (Progressive Web App), so you can add it to your home screen and launch it like a native app, even offline.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>How is this different from a &quot;what to discard&quot; (nanikiru) problem?</h4>
+                        <p>A nanikiru problem asks which tile to discard, while this app asks you to answer the exact ukeire count of the current hand as a number. It directly trains the ability to count ukeire accurately — the foundation that discard decisions are built on.</p>
+                    </div>
+                </div>
+            </section>
+
+            <hr>
+            <div class="credits">
+                <p class="credit-item twitter">
+                    <a href="https://x.com/AsayakeHahero" target="_blank" rel="noopener noreferrer">
+                        <span class="icon x-icon"></span>
+                        <span>Developer: @AsayakeHahero</span>
+                    </a>
+                </p>
+                <p class="credit-item mahjong-image">
+                    <a href="https://majandofu.com/mahjong-images" target="_blank" rel="noopener noreferrer">
+                        <span class="icon image-icon"></span>
+                        <span>Tile images by: Majandofu</span>
+                    </a>
+                </p>
+            </div>
+
+            <p class="lang-switch">
+                <a href="../">日本語</a> ・ <a href="../zh-Hant/">繁體中文</a> ・ <a href="../zh-Hans/">简体中文</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- ブックマーク一覧モーダル -->
+    <div id="bookmark-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button id="close-bookmark-modal-btn" class="close-button">&times;</button>
+            <h2>Bookmarks</h2>
+            <div class="bookmark-add">
+                <input id="bookmark-add-input" type="text" placeholder="Shared URL or 123m456p78889s11z format" autocomplete="off" spellcheck="false" enterkeyhint="done" />
+                <button id="bookmark-add-btn">Add</button>
+            </div>
+            <p id="bookmark-add-error" class="bookmark-add-error"></p>
+            <div id="bookmark-list"></div>
+        </div>
+    </div>
+</body>
+</html>

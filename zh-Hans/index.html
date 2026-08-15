@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>【麻将】进张练习 - 牌效率训练</title>
+    <link rel="icon" href="../favicon.png" type="image/png">
+    <link rel="canonical" href="https://asayake.org/Ishanten/zh-Hans/">
+    <link rel="alternate" hreflang="ja" href="https://asayake.org/Ishanten/">
+    <link rel="alternate" hreflang="en" href="https://asayake.org/Ishanten/en/">
+    <link rel="alternate" hreflang="zh-Hant" href="https://asayake.org/Ishanten/zh-Hant/">
+    <link rel="alternate" hreflang="zh-Hans" href="https://asayake.org/Ishanten/zh-Hans/">
+    <link rel="alternate" hreflang="x-default" href="https://asayake.org/Ishanten/">
+    <meta name="description" content="免费的立直麻将进张枚数计算练习App。挑战不同向听数与条件的题目，锻炼牌效率与何切判断的基本功。">
+    <meta name="keywords" content="麻将, 进张, 何切, 向听数, 立直麻将, 训练, 练习, App, 清一色, 牌效率">
+    <!-- OGP -->
+    <meta property="og:title" content="【麻将】进张练习 - 牌效率训练">
+    <meta property="og:description" content="免费的立直麻将进张枚数计算练习App。挑战不同向听数与条件的题目，锻炼牌效率与何切判断的基本功。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://asayake.org/Ishanten/zh-Hans/">
+    <meta property="og:image" content="https://asayake.org/Ishanten/pai-images/ogp_image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="麻将进张练习App的图标">
+    <meta property="og:site_name" content="【麻将】进张练习">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://asayake.org/Ishanten/pai-images/ogp_image.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "麻将进张练习",
+      "url": "https://asayake.org/Ishanten/zh-Hans/",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "zh-Hans",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+      "description": "免费的立直麻将进张枚数计算练习App，锻炼牌效率与何切判断的基本功。",
+      "author": { "@type": "Person", "name": "hahero", "url": "https://asayake.org/" }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "什么是进张？",
+          "acceptedAnswer": { "@type": "Answer", "text": "指现在手牌中，能让向听数往前推进一步的所有有效牌种类及其剩余枚数的总和。进张数越多，手牌越容易变好，是牌效率最基本的指标。" }
+        },
+        {
+          "@type": "Question",
+          "name": "什么是向听数？",
+          "acceptedAnswer": { "@type": "Answer", "text": "表示手牌还要经过几次换牌才能到达听牌状态的数值。0代表听牌，数字越大代表离听牌越远。" }
+        },
+        {
+          "@type": "Question",
+          "name": "什么是清一色模式？",
+          "acceptedAnswer": { "@type": "Answer", "text": "限定手牌只能由万子、筒子、索子其中一种数牌组成的练习模式。进张判断会变得更困难，适合进阶玩家练习。" }
+        },
+        {
+          "@type": "Question",
+          "name": "免费吗？需要注册会员吗？",
+          "acceptedAnswer": { "@type": "Answer", "text": "完全免费、无需注册，用浏览器即可立即开始练习。" }
+        },
+        {
+          "@type": "Question",
+          "name": "手机也能使用吗？",
+          "acceptedAnswer": { "@type": "Answer", "text": "可以。本App支持PWA（Progressive Web App），添加到主屏幕后可像App一样启动，离线也能使用。" }
+        },
+        {
+          "@type": "Question",
+          "name": "跟「何切」题目有什么不同？",
+          "acceptedAnswer": { "@type": "Answer", "text": "「何切」题目问的是该切哪张牌，而本App要求你直接以数字精确回答目前手牌的进张数。这能直接锻炼精确计算进张的能力，也是何切判断的基本功。" }
+        }
+      ]
+    }
+    </script>
+
+    <link rel="stylesheet" href="../style.css?v=6" />
+    <link rel="manifest" href="../manifest.json" />
+    <meta name="theme-color" content="#667eea" />
+    <!-- Google AdSense -->
+    <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7058313793336590"
+        crossorigin="anonymous"
+    ></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BE6C28P61K"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag("js", new Date());
+
+        gtag("config", "G-BE6C28P61K");
+    </script>
+
+    <!-- UI文言辞書。このインライン定義が正本(ビルド無し構成のためJSON等の別ファイルでは管理しない。script.js読み込み前に注入)。？モーダルの本文は下の静的HTMLに直接記述＝AIクローラ対応 -->
+    <script>
+        window.ISHANTEN_I18N = {
+  "meta": {
+    "title": "【麻将】进张练习 - 牌效率训练",
+    "description": "免费的立直麻将进张枚数计算练习App。挑战不同向听数与条件的题目，锻炼牌效率与何切判断的基本功。",
+    "keywords": "麻将, 进张, 何切, 向听数, 立直麻将, 训练, 练习, App, 清一色, 牌效率",
+    "ogSiteName": "【麻将】进张练习",
+    "ogImageAlt": "麻将进张练习App的图标",
+    "jsonldAppName": "麻将进张练习",
+    "jsonldAppDescription": "免费的立直麻将进张枚数计算练习App，锻炼牌效率与何切判断的基本功。"
+  },
+  "faq": [
+    {
+      "q": "什么是进张？",
+      "a": "指现在手牌中，能让向听数往前推进一步的所有有效牌种类及其剩余枚数的总和。进张数越多，手牌越容易变好，是牌效率最基本的指标。"
+    },
+    {
+      "q": "什么是向听数？",
+      "a": "表示手牌还要经过几次换牌才能到达听牌状态的数值。0代表听牌，数字越大代表离听牌越远。"
+    },
+    {
+      "q": "什么是清一色模式？",
+      "a": "限定手牌只能由万子、筒子、索子其中一种数牌组成的练习模式。进张判断会变得更困难，适合进阶玩家练习。"
+    },
+    {
+      "q": "免费吗？需要注册会员吗？",
+      "a": "完全免费、无需注册，用浏览器即可立即开始练习。"
+    },
+    {
+      "q": "手机也能使用吗？",
+      "a": "可以。本App支持PWA（Progressive Web App），添加到主屏幕后可像App一样启动，离线也能使用。"
+    },
+    {
+      "q": "跟「何切」题目有什么不同？",
+      "a": "「何切」题目问的是该切哪张牌，而本App要求你直接以数字精确回答目前手牌的进张数。这能直接锻炼精确计算进张的能力，也是何切判断的基本功。"
+    }
+  ],
+  "ui": {
+    "pageTitle": "麻将🀄进张练习",
+    "loaderGenerating": "正在生成手牌...",
+    "cancelGeneration": "取消",
+    "settingsToggleOpen": "设置 ▼",
+    "settingsToggleClose": "设置 ▲",
+    "shantenLabel": "向听数:",
+    "shantenOptions": {
+      "tenpai": "听牌",
+      "shanten1": "一向听",
+      "shanten2": "二向听",
+      "shanten3": "三向听"
+    },
+    "ukeireLabel": "进张数:",
+    "chinitsuLabel": "清一色模式:",
+    "tabHand": "手牌",
+    "tabUkeire": "进张",
+    "questionInitial": "这个手牌的进张数是多少？",
+    "submitBtn": "回答",
+    "giveupBtn": "放弃",
+    "shareBtn": "分享到X",
+    "bookmarkSaveBtn": "🔖 保存",
+    "bookmarkSavedBtn": "🔖 已保存",
+    "nextBtn": "下一题",
+    "msgCorrect": "正确！",
+    "msgIncorrect": "不正确，请再试一次。",
+    "msgAnswerReveal": "正确答案是 {n} 枚。",
+    "bookmarkModalTitle": "书签",
+    "bookmarkAddPlaceholder": "分享链接 或 123m456p78889s11z 格式",
+    "bookmarkAddBtn": "添加",
+    "bookmarkOpenBtn": "打开",
+    "bookmarkDeleteBtn": "删除",
+    "bookmarkEmptyMessage": "暂无书签",
+    "bookmarkInvalidFormat": "格式不正确（例如: 123m456p78889s11z 或分享链接）",
+    "bookmarkSaveFailed": "无法保存（浏览器存储空间无法使用）"
+  },
+  "help": {
+    "aboutHeading": "关于本App",
+    "aboutBody": "「麻将进张练习」是一款免费的浏览器训练App，用来锻炼麻将的牌效率（也就是何切判断的基础能力）。App会依照你设置的向听数与进张数范围随机生成手牌，让你以数字实际回答进张数，通过反复练习锻炼牌效率判断力。无需注册、完全免费。将它添加到手机主屏幕即可像App一样使用（支持PWA）。",
+    "howToHeading": "使用方法",
+    "steps": [
+      "从画面上方的「设置 ▼」设置想练习的<strong>向听数</strong>、<strong>进张数范围</strong>与<strong>清一色模式</strong>。",
+      "设置完成后，会自动生成符合条件的题目。",
+      "确认画面上显示的13张手牌，计算要听牌所需的进张数。",
+      "用画面下方的计算器输入你算出的张数。",
+      "按下「回答」按钮核对答案。"
+    ],
+    "stepCorrectCase": "<strong>答对时</strong>：「进张」分页会开启，可以确认进张牌。按「下一题」进入新题目。",
+    "stepIncorrectCase": "<strong>答错时</strong>：会显示消息，可以再挑战一次。",
+    "stepGiveUp": "不知道答案时，可以按「放弃」查看正确答案与进张牌列表。",
+    "glossaryHeading": "用语解说",
+    "glossary": [
+      {
+        "term": "什么是进张",
+        "desc": "指现在手牌中，能让向听数往前推进一步（更接近听牌）的所有有效牌种类及其剩余枚数的总和。是牌效率与何切判断最基本的指标。英文称为 ukeire、tile efficiency。"
+      },
+      {
+        "term": "什么是向听数",
+        "desc": "表示还要经过几巡、几次变化才能到达听牌状态的数值。0＝听牌、1＝一向听、2＝二向听、3＝三向听。英文称为 shanten。"
+      },
+      {
+        "term": "什么是牌效率",
+        "desc": "选择能让手牌进张数尽量增加的打牌方式。是何切问题的基础技术。"
+      },
+      {
+        "term": "什么是清一色模式",
+        "desc": "限定手牌只能由万子、筒子、索子其中一种数牌组成。进张数的计算会变得更复杂，适合进阶练习。"
+      }
+    ],
+    "faqHeading": "常见问题",
+    "creditsDeveloper": "开发者: @AsayakeHahero",
+    "creditsImage": "牌图提供: 麻雀豆腐"
+  },
+  "share": {
+    "text": "这个手牌的进张数是多少？",
+    "hashtags": "#麻将 #进张练习"
+  },
+  "langNames": {
+    "ja": "日本語",
+    "en": "English",
+    "zh-Hant": "繁體中文",
+    "zh-Hans": "简体中文"
+  }
+};
+    </script>
+</head>
+
+<body>
+    <div id="loader-overlay" class="loader-overlay" style="display: none;">
+        <div class="loader"></div>
+        <p>正在生成手牌...</p>
+        <button id="cancel-generation-btn" class="action-btn giveup">取消</button>
+    </div>
+
+    <div class="container">
+        <div class="title-container">
+            <button id="bookmark-list-btn" class="bookmark-list-button">🔖</button>
+            <h1>麻将🀄进张练习</h1>
+            <button id="help-btn" class="help-button">？</button>
+        </div>
+
+        <div class="settings-wrapper">
+            <button id="settings-toggle-btn">设置 ▼</button>
+            <div id="settings-panel" class="settings" style="display: none;">
+                <div class="setting-item">
+                    <label for="shanten-select">向听数:</label>
+                    <select id="shanten-select">
+                        <option value="0">听牌</option>
+                        <option value="1" selected>一向听</option>
+                        <option value="2">二向听</option>
+                        <option value="3">三向听</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <label for="min-ukeire">进张数:</label>
+                    <div class="range-inputs">
+                        <input type="number" id="min-ukeire" value="1" min="1" />
+                        <span>～</span>
+                        <input type="number" id="max-ukeire" value="123" min="1" />
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label for="chinitsu-checkbox">清一色模式:</label>
+                    <div class="toggle-switch-container">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="chinitsu-checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="display-area">
+                <div class="display-tabs">
+                    <button id="tab-hand" class="tab-btn active">手牌</button>
+                    <button id="tab-ukeire" class="tab-btn" disabled>进张</button>
+                </div>
+
+                <div id="hand-view" class="tab-content active">
+                    <div id="tiles-container" class="tiles-container">
+                        <!-- 牌が動的に表示されます -->
+                    </div>
+                </div>
+
+                <div id="ukeire-view" class="tab-content">
+                    <div id="ukeire-tiles" class="tiles-container"></div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="question-area">
+                    <h3 id="question-text">这个手牌的进张数是多少？</h3>
+
+                    <div class="calculator">
+                        <div id="display" class="display">0</div>
+                        <div class="button-grid">
+                            <button class="calc-btn number" onclick="appendNumber('1')">1</button>
+                            <button class="calc-btn number" onclick="appendNumber('2')">2</button>
+                            <button class="calc-btn number" onclick="appendNumber('3')">3</button>
+                            <button class="calc-btn number" onclick="appendNumber('4')">4</button>
+                            <button class="calc-btn number" onclick="appendNumber('5')">5</button>
+                            <button class="calc-btn number" onclick="appendNumber('6')">6</button>
+                            <button class="calc-btn number" onclick="appendNumber('7')">7</button>
+                            <button class="calc-btn number" onclick="appendNumber('8')">8</button>
+                            <button class="calc-btn number" onclick="appendNumber('9')">9</button>
+                            <button class="calc-btn clear" onclick="clearDisplay()">C</button>
+                            <button class="calc-btn number" onclick="appendNumber('0')">0</button>
+                            <button class="calc-btn" onclick="deleteLast()">⌫</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="submit-btn" class="action-btn submit" onclick="submitAnswer()">
+                        回答
+                    </button>
+                    <button id="giveup-btn" class="action-btn giveup" onclick="giveUp()">放弃</button>
+                    <button id="share-btn" class="action-btn share" onclick="shareToX()" style="display: none;">分享到X</button>
+                    <button id="bookmark-btn" class="action-btn bookmark" onclick="toggleBookmark()" style="display: none;">🔖 保存</button>
+                    <button
+                        id="next-btn"
+                        class="action-btn next"
+                        onclick="nextProblem()"
+                        style="display: none;"
+                    >
+                        下一题
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../script.js?v=6"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker
+                    .register("../sw.js")
+                    .then((registration) => {
+                        console.log(
+                            "ServiceWorker registration successful with scope: ",
+                            registration.scope
+                        );
+                    })
+                    .catch((err) => {
+                        console.log("ServiceWorker registration failed: ", err);
+                    });
+            });
+        }
+    </script>
+
+    <!-- 遊び方モーダル -->
+    <div id="help-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button id="close-modal-btn" class="close-button">&times;</button>
+
+            <section class="about-section" aria-labelledby="about-heading">
+                <h2 id="about-heading">关于本App</h2>
+                <p>
+                    「麻将进张练习」是一款免费的浏览器训练App，用来锻炼麻将的牌效率（也就是何切判断的基础能力）。App会依照你设置的向听数与进张数范围随机生成手牌，让你以数字实际回答进张数，通过反复练习锻炼牌效率判断力。无需注册、完全免费。将它添加到手机主屏幕即可像App一样使用（支持PWA）。
+                </p>
+
+                <h3>使用方法</h3>
+                <ol>
+                    <li>从画面上方的「设置 ▼」设置想练习的<strong>向听数</strong>、<strong>进张数范围</strong>与<strong>清一色模式</strong>。</li>
+                    <li>设置完成后，会自动生成符合条件的题目。</li>
+                    <li>确认画面上显示的13张手牌，计算要听牌所需的进张数。</li>
+                    <li>用画面下方的计算器输入你算出的张数。</li>
+                    <li>按下「回答」按钮核对答案。
+                        <ul>
+                            <li><strong>答对时</strong>：「进张」分页会开启，可以确认进张牌。按「下一题」进入新题目。</li>
+                            <li><strong>答错时</strong>：会显示消息，可以再挑战一次。</li>
+                        </ul>
+                    </li>
+                    <li>不知道答案时，可以按「放弃」查看正确答案与进张牌列表。</li>
+                </ol>
+
+                <h3>用语解说</h3>
+                <dl class="glossary">
+                    <dt>什么是进张</dt>
+                    <dd>指现在手牌中，能让向听数往前推进一步（更接近听牌）的所有有效牌种类及其剩余枚数的总和。是牌效率与何切判断最基本的指标。英文称为 ukeire、tile efficiency。</dd>
+
+                    <dt>什么是向听数</dt>
+                    <dd>表示还要经过几巡、几次变化才能到达听牌状态的数值。0＝听牌、1＝一向听、2＝二向听、3＝三向听。英文称为 shanten。</dd>
+
+                    <dt>什么是牌效率</dt>
+                    <dd>选择能让手牌进张数尽量增加的打牌方式。是何切问题的基础技术。</dd>
+
+                    <dt>什么是清一色模式</dt>
+                    <dd>限定手牌只能由万子、筒子、索子其中一种数牌组成。进张数的计算会变得更复杂，适合进阶练习。</dd>
+                </dl>
+
+                <h3>常见问题</h3>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <h4>什么是进张？</h4>
+                        <p>指现在手牌中，能让向听数往前推进一步的所有有效牌种类及其剩余枚数的总和。进张数越多，手牌越容易变好，是牌效率最基本的指标。</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>什么是向听数？</h4>
+                        <p>表示手牌还要经过几次换牌才能到达听牌状态的数值。0代表听牌，数字越大代表离听牌越远。</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>什么是清一色模式？</h4>
+                        <p>限定手牌只能由万子、筒子、索子其中一种数牌组成的练习模式。进张判断会变得更困难，适合进阶玩家练习。</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>免费吗？需要注册会员吗？</h4>
+                        <p>完全免费、无需注册，用浏览器即可立即开始练习。</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>手机也能使用吗？</h4>
+                        <p>可以。本App支持PWA（Progressive Web App），添加到主屏幕后可像App一样启动，离线也能使用。</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>跟「何切」题目有什么不同？</h4>
+                        <p>「何切」题目问的是该切哪张牌，而本App要求你直接以数字精确回答目前手牌的进张数。这能直接锻炼精确计算进张的能力，也是何切判断的基本功。</p>
+                    </div>
+                </div>
+            </section>
+
+            <hr>
+            <div class="credits">
+                <p class="credit-item twitter">
+                    <a href="https://x.com/AsayakeHahero" target="_blank" rel="noopener noreferrer">
+                        <span class="icon x-icon"></span>
+                        <span>开发者: @AsayakeHahero</span>
+                    </a>
+                </p>
+                <p class="credit-item mahjong-image">
+                    <a href="https://majandofu.com/mahjong-images" target="_blank" rel="noopener noreferrer">
+                        <span class="icon image-icon"></span>
+                        <span>牌图提供: 麻雀豆腐</span>
+                    </a>
+                </p>
+            </div>
+
+            <p class="lang-switch">
+                <a href="../">日本語</a> ・ <a href="../en/">English</a> ・ <a href="../zh-Hant/">繁體中文</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- ブックマーク一覧モーダル -->
+    <div id="bookmark-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button id="close-bookmark-modal-btn" class="close-button">&times;</button>
+            <h2>书签</h2>
+            <div class="bookmark-add">
+                <input id="bookmark-add-input" type="text" placeholder="分享链接 或 123m456p78889s11z 格式" autocomplete="off" spellcheck="false" enterkeyhint="done" />
+                <button id="bookmark-add-btn">添加</button>
+            </div>
+            <p id="bookmark-add-error" class="bookmark-add-error"></p>
+            <div id="bookmark-list"></div>
+        </div>
+    </div>
+</body>
+</html>

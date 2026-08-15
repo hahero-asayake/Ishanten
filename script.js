@@ -1,3 +1,20 @@
+// 多言語対応: 言語別ページ(/en/ /zh-Hant/ /zh-Hans/)は、各ページのindex.html内に静的にインライン定義した
+// window.ISHANTEN_I18N をこのscriptタグの読み込み前に注入する（ビルド無し構成のため、このインライン定義が辞書の正本）。
+// 日本語版は注入せず、常にフォールバック（元の日本語文言）を使うため出力は不変。
+const I18N_DICT = window.ISHANTEN_I18N || null;
+function t(path, fallback) {
+    if (!I18N_DICT) return fallback;
+    const v = path.split('.').reduce((o, k) => (o && o[k] !== undefined) ? o[k] : undefined, I18N_DICT);
+    return v !== undefined ? v : fallback;
+}
+
+// 言語別ページ(/en/ /zh-Hant/ /zh-Hans/)は1階層下からこのファイルを読み込むため、
+// pai-images等の相対パスはこのスクリプト自身のURLを基準に解決する（このscriptタグは同期読み込みのためcurrentScriptが有効）。
+const SCRIPT_BASE = (() => {
+    const src = document.currentScript && document.currentScript.src;
+    return src ? src.slice(0, src.lastIndexOf('/') + 1) : '';
+})();
+
 // 麻雀牌の定義
 const TILES = {
   man: ['1m','2m','3m','4m','5m','6m','7m','8m','9m'], // 萬子
@@ -361,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
     settingsToggleBtn.addEventListener('click', () => {
         const isHidden = settingsPanel.style.display === 'none';
         settingsPanel.style.display = isHidden ? 'flex' : 'none';
-        settingsToggleBtn.textContent = isHidden ? '設定 ▲' : '設定 ▼';
+        settingsToggleBtn.textContent = isHidden ? t('ui.settingsToggleClose', '設定 ▲') : t('ui.settingsToggleOpen', '設定 ▼');
     });
 
     // タブ切り替え機能
@@ -492,7 +509,7 @@ function displayHand(hand) {
     
     hand.forEach(tile => {
         const imgElement = document.createElement('img');
-        imgElement.src = `pai-images/${getTileImageFilename(tile)}`;
+        imgElement.src = `${SCRIPT_BASE}pai-images/${getTileImageFilename(tile)}`;
         imgElement.className = 'tile';
         imgElement.setAttribute('title', TILE_NAMES[tile] || tile);
         container.appendChild(imgElement);
@@ -511,7 +528,7 @@ function displayUkeire(ukeire) {
         tileWrapper.className = 'ukeire-tile-wrapper';
 
         const imgElement = document.createElement('img');
-        imgElement.src = `pai-images/${getTileImageFilename(tile)}`;
+        imgElement.src = `${SCRIPT_BASE}pai-images/${getTileImageFilename(tile)}`;
         imgElement.className = 'tile';
         imgElement.setAttribute('title', TILE_NAMES[tile] || tile);
 
@@ -561,14 +578,14 @@ function submitAnswer() {
     const questionText = document.getElementById('question-text');
 
     if (userAnswer === currentAnswer) {
-        questionText.textContent = '正解！';
+        questionText.textContent = t('ui.msgCorrect', '正解！');
         questionText.className = 'correct';
         nextBtn.style.display = 'block';
         gameState = 'answered';
         displayUkeire(currentUkeire);
         disableButtons();
     } else {
-        questionText.textContent = `不正解です。再挑戦してください。`;
+        questionText.textContent = t('ui.msgIncorrect', '不正解です。再挑戦してください。');
         questionText.className = 'incorrect';
         nextBtn.style.display = 'none';
     }
@@ -581,7 +598,7 @@ function giveUp() {
     const nextBtn = document.getElementById('next-btn');
     const questionText = document.getElementById('question-text');
 
-    questionText.textContent = `正解は ${currentAnswer} 枚でした。`;
+    questionText.textContent = t('ui.msgAnswerReveal', '正解は {n} 枚でした。').replace('{n}', currentAnswer);
     questionText.className = 'answer';
     nextBtn.style.display = 'block';
     gameState = 'given_up';
@@ -598,7 +615,7 @@ function nextProblem() {
 function resetUI() {
     document.getElementById('display').textContent = '0';
     const questionText = document.getElementById('question-text');
-    questionText.textContent = 'この手牌の受け入れ枚数は？';
+    questionText.textContent = t('ui.questionInitial', 'この手牌の受け入れ枚数は？');
     questionText.className = '';
     document.getElementById('next-btn').style.display = 'none';
     
@@ -722,10 +739,10 @@ function shareToX() {
     if (currentHand.length !== 13) return; // 生成完了前の空手牌ウィンドウで空URLを共有しない
     const hand = encodeHand(currentHand);
     const problemUrl = location.origin + location.pathname + '?q=' + hand;
-    const text = 'この手牌の受け入れ枚数は何枚？\n'
+    const text = t('share.text', 'この手牌の受け入れ枚数は何枚？') + '\n'
         + handToEmoji(currentHand) + '\n'
         + problemUrl + '\n'
-        + '#麻雀 #受け入れ枚数練習';
+        + t('share.hashtags', '#麻雀 #受け入れ枚数練習');
     const intent = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
     window.open(intent, '_blank', 'noopener');
 }
@@ -761,7 +778,7 @@ function updateBookmarkBtn() {
     const btn = document.getElementById('bookmark-btn');
     if (!btn) return; // SW更新過渡期の旧HTML+新JS混成でも壊さない
     const saved = isBookmarked(encodeHand(currentHand));
-    btn.textContent = saved ? '🔖 保存済み' : '🔖 保存';
+    btn.textContent = saved ? t('ui.bookmarkSavedBtn', '🔖 保存済み') : t('ui.bookmarkSaveBtn', '🔖 保存');
     btn.classList.toggle('saved', saved);
 }
 function toggleBookmark() {
@@ -781,13 +798,13 @@ function registerBookmarkFromInput() {
     if (m) v = m[1];
     const tiles = decodeHand(v);
     if (!tiles) {
-        if (error) error.textContent = '形式が正しくありません（例: 123m456p78889s11z か 共有URL）';
+        if (error) error.textContent = t('ui.bookmarkInvalidFormat', '形式が正しくありません（例: 123m456p78889s11z か 共有URL）');
         return;
     }
     const q = encodeHand(tiles);
     addBookmark(q);
     if (!isBookmarked(q)) { // ストレージ不可環境（プライベートモード等）では成功に見せない
-        if (error) error.textContent = '保存できませんでした（ブラウザのストレージが利用できません）';
+        if (error) error.textContent = t('ui.bookmarkSaveFailed', '保存できませんでした（ブラウザのストレージが利用できません）');
         return;
     }
     input.value = '';
@@ -812,21 +829,21 @@ function renderBookmarkList() {
         tilesDiv.className = 'bm-tiles';
         tiles.forEach(t => {
             const img = document.createElement('img');
-            img.src = `pai-images/${getTileImageFilename(t)}`;
+            img.src = `${SCRIPT_BASE}pai-images/${getTileImageFilename(t)}`;
             tilesDiv.appendChild(img);
         });
         const openBtn = document.createElement('button');
-        openBtn.textContent = '開く';
+        openBtn.textContent = t('ui.bookmarkOpenBtn', '開く');
         openBtn.className = 'bm-open';
         openBtn.onclick = () => { location.href = location.pathname + '?q=' + item.q; };
         const delBtn = document.createElement('button');
-        delBtn.textContent = '削除';
+        delBtn.textContent = t('ui.bookmarkDeleteBtn', '削除');
         delBtn.className = 'bm-del';
         delBtn.onclick = () => { removeBookmark(item.q); renderBookmarkList(); updateBookmarkBtn(); };
         row.append(tilesDiv, openBtn, delBtn);
         container.appendChild(row);
     });
     if (rendered === 0) {
-        container.textContent = 'ブックマークはまだありません'; // 全件壊れエントリでも空白にしない
+        container.textContent = t('ui.bookmarkEmptyMessage', 'ブックマークはまだありません'); // 全件壊れエントリでも空白にしない
     }
 }
