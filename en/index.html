@@ -39,46 +39,7 @@
       "author": { "@type": "Person", "name": "hahero", "url": "https://asayake.org/" }
     }
     </script>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What is ukeire (tile acceptance)?",
-          "acceptedAnswer": { "@type": "Answer", "text": "It's the total number of remaining tiles, across all useful tile types, that would advance your current hand's shanten by one step. A higher ukeire means your hand can progress more easily, and it's the most basic measure of tile efficiency." }
-        },
-        {
-          "@type": "Question",
-          "name": "What is shanten?",
-          "acceptedAnswer": { "@type": "Answer", "text": "It's a number showing how many more tile exchanges are needed to reach tenpai (a ready hand). 0 means tenpai, and higher numbers mean the hand is further from tenpai." }
-        },
-        {
-          "@type": "Question",
-          "name": "What is Full Flush (chinitsu) mode?",
-          "acceptedAnswer": { "@type": "Answer", "text": "A practice mode where the hand is restricted to a single suit — characters, circles, or bamboo. Judging ukeire becomes harder, making it suited for advanced players." }
-        },
-        {
-          "@type": "Question",
-          "name": "Is it free? Do I need to register?",
-          "acceptedAnswer": { "@type": "Answer", "text": "It's completely free with no registration required. You can start practicing right away in your browser." }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I use it on a smartphone?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. It supports PWA (Progressive Web App), so you can add it to your home screen and launch it like a native app, even offline." }
-        },
-        {
-          "@type": "Question",
-          "name": "How is this different from a \"what to discard\" (nanikiru) problem?",
-          "acceptedAnswer": { "@type": "Answer", "text": "A nanikiru problem asks which tile to discard, while this app asks you to answer the exact ukeire count of the current hand as a number. It directly trains the ability to count ukeire accurately — the foundation that discard decisions are built on." }
-        }
-      ]
-    }
-    </script>
-
-    <link rel="stylesheet" href="../style.css?v=6" />
+    <link rel="stylesheet" href="../style.css?v=7" />
     <link rel="manifest" href="../manifest.json" />
     <meta name="theme-color" content="#667eea" />
     <!-- Google AdSense -->
@@ -112,32 +73,6 @@
     "jsonldAppName": "Mahjong Ukeire Trainer",
     "jsonldAppDescription": "A free training app to practice calculating ukeire in riichi mahjong. Build your foundation in tile efficiency and discard decisions."
   },
-  "faq": [
-    {
-      "q": "What is ukeire (tile acceptance)?",
-      "a": "It's the total number of remaining tiles, across all useful tile types, that would advance your current hand's shanten by one step. A higher ukeire means your hand can progress more easily, and it's the most basic measure of tile efficiency."
-    },
-    {
-      "q": "What is shanten?",
-      "a": "It's a number showing how many more tile exchanges are needed to reach tenpai (a ready hand). 0 means tenpai, and higher numbers mean the hand is further from tenpai."
-    },
-    {
-      "q": "What is Full Flush (chinitsu) mode?",
-      "a": "A practice mode where the hand is restricted to a single suit — characters, circles, or bamboo. Judging ukeire becomes harder, making it suited for advanced players."
-    },
-    {
-      "q": "Is it free? Do I need to register?",
-      "a": "It's completely free with no registration required. You can start practicing right away in your browser."
-    },
-    {
-      "q": "Can I use it on a smartphone?",
-      "a": "Yes. It supports PWA (Progressive Web App), so you can add it to your home screen and launch it like a native app, even offline."
-    },
-    {
-      "q": "How is this different from a \"what to discard\" (nanikiru) problem?",
-      "a": "A nanikiru problem asks which tile to discard, while this app asks you to answer the exact ukeire count of the current hand as a number. It directly trains the ability to count ukeire accurately — the foundation that discard decisions are built on."
-    }
-  ],
   "ui": {
     "pageTitle": "Mahjong 🀄 Ukeire Trainer",
     "loaderGenerating": "Generating hand...",
@@ -207,7 +142,6 @@
         "desc": "A restriction where the hand is built from only one suit — characters, circles, or bamboo. Counting ukeire becomes more complex, making it suited for advanced practice."
       }
     ],
-    "faqHeading": "FAQ",
     "creditsDeveloper": "Developer: @AsayakeHahero",
     "creditsImage": "Tile images by: Majandofu"
   },
@@ -333,7 +267,7 @@
         </div>
     </div>
 
-    <script src="../script.js?v=6"></script>
+    <script src="../script.js?v=7"></script>
     <script>
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
@@ -365,7 +299,7 @@
                 </p>
 
                 <p>
-                    &quot;Mahjong Ukeire Trainer&quot; is a free browser-based training app for building tile efficiency (the underlying skill behind nanikiru/discard decisions). It randomly generates hands within your chosen shanten and ukeire range, and you answer the actual ukeire count as a number — repeated practice that sharpens your tile-efficiency judgment. No registration, completely free. Add it to your smartphone's home screen to use it like a native app (PWA support).
+                    &quot;Mahjong Ukeire Trainer&quot; is a free browser-based training app for building tile efficiency (the underlying skill behind nanikiru/discard decisions). It randomly generates hands within your chosen shanten and ukeire range, and you answer the actual ukeire count as a number — repeated practice that sharpens your tile-efficiency judgment. No registration, completely free. Add it to your smartphone's home screen to use it like a native app (PWA support). A nanikiru problem asks which tile to discard, while this app asks you to answer the exact ukeire count of the current hand as a number. It directly trains the ability to count ukeire accurately — the foundation that discard decisions are built on.
                 </p>
 
                 <h3>How to use</h3>
@@ -397,34 +331,6 @@
                     <dt>What is Full Flush (chinitsu) mode?</dt>
                     <dd>A restriction where the hand is built from only one suit — characters, circles, or bamboo. Counting ukeire becomes more complex, making it suited for advanced practice.</dd>
                 </dl>
-
-                <h3>FAQ</h3>
-                <div class="faq-list">
-                    <div class="faq-item">
-                        <h4>What is ukeire (tile acceptance)?</h4>
-                        <p>It's the total number of remaining tiles, across all useful tile types, that would advance your current hand's shanten by one step. A higher ukeire means your hand can progress more easily, and it's the most basic measure of tile efficiency.</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>What is shanten?</h4>
-                        <p>It's a number showing how many more tile exchanges are needed to reach tenpai (a ready hand). 0 means tenpai, and higher numbers mean the hand is further from tenpai.</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>What is Full Flush (chinitsu) mode?</h4>
-                        <p>A practice mode where the hand is restricted to a single suit — characters, circles, or bamboo. Judging ukeire becomes harder, making it suited for advanced players.</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>Is it free? Do I need to register?</h4>
-                        <p>It's completely free with no registration required. You can start practicing right away in your browser.</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>Can I use it on a smartphone?</h4>
-                        <p>Yes. It supports PWA (Progressive Web App), so you can add it to your home screen and launch it like a native app, even offline.</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>How is this different from a &quot;what to discard&quot; (nanikiru) problem?</h4>
-                        <p>A nanikiru problem asks which tile to discard, while this app asks you to answer the exact ukeire count of the current hand as a number. It directly trains the ability to count ukeire accurately — the foundation that discard decisions are built on.</p>
-                    </div>
-                </div>
             </section>
 
             <hr>

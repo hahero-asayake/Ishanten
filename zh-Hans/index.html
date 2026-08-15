@@ -39,46 +39,7 @@
       "author": { "@type": "Person", "name": "hahero", "url": "https://asayake.org/" }
     }
     </script>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "什么是进张？",
-          "acceptedAnswer": { "@type": "Answer", "text": "指现在手牌中，能让向听数往前推进一步的所有有效牌种类及其剩余枚数的总和。进张数越多，手牌越容易变好，是牌效率最基本的指标。" }
-        },
-        {
-          "@type": "Question",
-          "name": "什么是向听数？",
-          "acceptedAnswer": { "@type": "Answer", "text": "表示手牌还要经过几次换牌才能到达听牌状态的数值。0代表听牌，数字越大代表离听牌越远。" }
-        },
-        {
-          "@type": "Question",
-          "name": "什么是清一色模式？",
-          "acceptedAnswer": { "@type": "Answer", "text": "限定手牌只能由万子、筒子、索子其中一种数牌组成的练习模式。进张判断会变得更困难，适合进阶玩家练习。" }
-        },
-        {
-          "@type": "Question",
-          "name": "免费吗？需要注册会员吗？",
-          "acceptedAnswer": { "@type": "Answer", "text": "完全免费、无需注册，用浏览器即可立即开始练习。" }
-        },
-        {
-          "@type": "Question",
-          "name": "手机也能使用吗？",
-          "acceptedAnswer": { "@type": "Answer", "text": "可以。本App支持PWA（Progressive Web App），添加到主屏幕后可像App一样启动，离线也能使用。" }
-        },
-        {
-          "@type": "Question",
-          "name": "跟「何切」题目有什么不同？",
-          "acceptedAnswer": { "@type": "Answer", "text": "「何切」题目问的是该切哪张牌，而本App要求你直接以数字精确回答目前手牌的进张数。这能直接锻炼精确计算进张的能力，也是何切判断的基本功。" }
-        }
-      ]
-    }
-    </script>
-
-    <link rel="stylesheet" href="../style.css?v=6" />
+    <link rel="stylesheet" href="../style.css?v=7" />
     <link rel="manifest" href="../manifest.json" />
     <meta name="theme-color" content="#667eea" />
     <!-- Google AdSense -->
@@ -112,32 +73,6 @@
     "jsonldAppName": "麻将进张练习",
     "jsonldAppDescription": "免费的立直麻将进张枚数计算练习App，锻炼牌效率与何切判断的基本功。"
   },
-  "faq": [
-    {
-      "q": "什么是进张？",
-      "a": "指现在手牌中，能让向听数往前推进一步的所有有效牌种类及其剩余枚数的总和。进张数越多，手牌越容易变好，是牌效率最基本的指标。"
-    },
-    {
-      "q": "什么是向听数？",
-      "a": "表示手牌还要经过几次换牌才能到达听牌状态的数值。0代表听牌，数字越大代表离听牌越远。"
-    },
-    {
-      "q": "什么是清一色模式？",
-      "a": "限定手牌只能由万子、筒子、索子其中一种数牌组成的练习模式。进张判断会变得更困难，适合进阶玩家练习。"
-    },
-    {
-      "q": "免费吗？需要注册会员吗？",
-      "a": "完全免费、无需注册，用浏览器即可立即开始练习。"
-    },
-    {
-      "q": "手机也能使用吗？",
-      "a": "可以。本App支持PWA（Progressive Web App），添加到主屏幕后可像App一样启动，离线也能使用。"
-    },
-    {
-      "q": "跟「何切」题目有什么不同？",
-      "a": "「何切」题目问的是该切哪张牌，而本App要求你直接以数字精确回答目前手牌的进张数。这能直接锻炼精确计算进张的能力，也是何切判断的基本功。"
-    }
-  ],
   "ui": {
     "pageTitle": "麻将🀄进张练习",
     "loaderGenerating": "正在生成手牌...",
@@ -207,7 +142,6 @@
         "desc": "限定手牌只能由万子、筒子、索子其中一种数牌组成。进张数的计算会变得更复杂，适合进阶练习。"
       }
     ],
-    "faqHeading": "常见问题",
     "creditsDeveloper": "开发者: @AsayakeHahero",
     "creditsImage": "牌图提供: 麻雀豆腐"
   },
@@ -333,7 +267,7 @@
         </div>
     </div>
 
-    <script src="../script.js?v=6"></script>
+    <script src="../script.js?v=7"></script>
     <script>
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
@@ -365,7 +299,7 @@
                 </p>
 
                 <p>
-                    「麻将进张练习」是一款免费的浏览器训练App，用来锻炼麻将的牌效率（也就是何切判断的基础能力）。App会依照你设置的向听数与进张数范围随机生成手牌，让你以数字实际回答进张数，通过反复练习锻炼牌效率判断力。无需注册、完全免费。将它添加到手机主屏幕即可像App一样使用（支持PWA）。
+                    「麻将进张练习」是一款免费的浏览器训练App，用来锻炼麻将的牌效率（也就是何切判断的基础能力）。App会依照你设置的向听数与进张数范围随机生成手牌，让你以数字实际回答进张数，通过反复练习锻炼牌效率判断力。无需注册、完全免费。将它添加到手机主屏幕即可像App一样使用（支持PWA）。「何切」题目问的是该切哪张牌，而本App要求你直接以数字精确回答目前手牌的进张数。这能直接锻炼精确计算进张的能力，也是何切判断的基本功。
                 </p>
 
                 <h3>使用方法</h3>
@@ -397,34 +331,6 @@
                     <dt>什么是清一色模式</dt>
                     <dd>限定手牌只能由万子、筒子、索子其中一种数牌组成。进张数的计算会变得更复杂，适合进阶练习。</dd>
                 </dl>
-
-                <h3>常见问题</h3>
-                <div class="faq-list">
-                    <div class="faq-item">
-                        <h4>什么是进张？</h4>
-                        <p>指现在手牌中，能让向听数往前推进一步的所有有效牌种类及其剩余枚数的总和。进张数越多，手牌越容易变好，是牌效率最基本的指标。</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>什么是向听数？</h4>
-                        <p>表示手牌还要经过几次换牌才能到达听牌状态的数值。0代表听牌，数字越大代表离听牌越远。</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>什么是清一色模式？</h4>
-                        <p>限定手牌只能由万子、筒子、索子其中一种数牌组成的练习模式。进张判断会变得更困难，适合进阶玩家练习。</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>免费吗？需要注册会员吗？</h4>
-                        <p>完全免费、无需注册，用浏览器即可立即开始练习。</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>手机也能使用吗？</h4>
-                        <p>可以。本App支持PWA（Progressive Web App），添加到主屏幕后可像App一样启动，离线也能使用。</p>
-                    </div>
-                    <div class="faq-item">
-                        <h4>跟「何切」题目有什么不同？</h4>
-                        <p>「何切」题目问的是该切哪张牌，而本App要求你直接以数字精确回答目前手牌的进张数。这能直接锻炼精确计算进张的能力，也是何切判断的基本功。</p>
-                    </div>
-                </div>
             </section>
 
             <hr>

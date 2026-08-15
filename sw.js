@@ -1,10 +1,10 @@
-const CACHE_NAME = 'nanikiru-cache-v6';
+const CACHE_NAME = 'nanikiru-cache-v7';
 // キャッシュするファイルのリスト（?v= は index.html の参照と必ず一致させる）
 const urlsToCache = [
   '.',
   'index.html',
-  'style.css?v=6',
-  'script.js?v=6',
+  'style.css?v=7',
+  'script.js?v=7',
   'manifest.json',
   // 言語別ページ（オフライン時も日本語版と同じ体験にする。3ページ分＝数十KB程度で増分は小さい）
   'en/',
@@ -33,7 +33,7 @@ self.addEventListener('install', event => {
 self.addEventListener('fetch', event => {
   // ページ遷移（?q= 付き共有URL含む）はキャッシュ済み index.html を返す
   // 言語別ページ（/en/ /zh-Hant/ /zh-Hans/）はそれぞれの index.html を返す（無条件に日本語版へフォールバックしない）
-  // ※全requestへの ignoreSearch は禁止（style.css?v=6 が旧 style.css にマッチしてバスト無効化するため）
+  // ※全requestへの ignoreSearch は禁止（style.css?v=7 が旧 style.css にマッチしてバスト無効化するため）
   if (event.request.mode === 'navigate') {
     const langMatch = new URL(event.request.url).pathname.match(/\/(en|zh-Hant|zh-Hans)(?:\/|$)/);
     const cacheKey = langMatch ? `./${langMatch[1]}/index.html` : './index.html';
